@@ -17,7 +17,7 @@ app = Flask(__name__)
 @app.route('/canteen', methods=['GET'])
 def get_weekly_meal():
     global weekly_meal
-    try :
+    try:
         for days in days_of_week:
             print(weekly_meal[days])
         return 'ok'
@@ -36,11 +36,12 @@ def check_meal(day, month, year):
     try:
         print(weekly_meal[str(day + '/' + month + '/' + year)])
     except:
-        data=requests.get(str(url_canteen_day + day + '/' + month + '/' + year))
+        data = requests.get(url_canteen_day+str(day + '/' + month + '/' + year))
         for item in data.json():
             weekly_meal[item['day']] = item['meal']
-        print(weekly_meal)
+        print(weekly_meal[str(day + '/' + month + '/' + year)])
         return "added nex week"
+
 
 def list_days_of_week():
     global days_of_week
@@ -50,19 +51,10 @@ def list_days_of_week():
     print(str(start))
     days_of_week.append(start.strftime('%d/%m/%Y'))
     for i in range(4):
-        days_of_week.append((start + timedelta(days=i)).strftime('%d/%m/%Y'))
-    print (days_of_week)
+        days_of_week.append((start + timedelta(days=i+1)).strftime('%d/%m/%Y'))
+    print(days_of_week)
 
 
 if __name__ == '__main__':
-    print(weekly_meal)
     list_days_of_week()
     app.run()
-
-
-#day = '22/11/2019'
-#dt = datetime.strptime(day, '%d/%m/%Y')
-#start = dt - timedelta(days=dt.weekday())
-#end = start + timedelta(days=4)
-#print(start)
-#print(end)
