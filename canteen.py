@@ -1,5 +1,6 @@
 from flask import Flask
 import json
+from flask import render_template
 from datetime import date
 from datetime import datetime, timedelta
 import requests
