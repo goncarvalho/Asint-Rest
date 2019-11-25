@@ -31,29 +31,21 @@ def get_spaces(id):
                 rooms_by_id[str(id)] = ({'building': floor.json()['parentSpace']['name'],
                                          'campus': floor.json()['parentSpace']['topLevelSpace']['name']})
 
-            pass
-
             if key == 'events':
-                rooms_by_id[str(id)].update({'events': room_info['events']})
-                print(rooms_by_id)
+                rooms_by_id[str(id)].update({'events': {}})
+                for item in room_info[key]:
+                    if item['day'] in (rooms_by_id[str(id)]['events']):
+                        print('OLA')
+                        rooms_by_id[str(id)]['events'][item['day']].append(item)
+                    else:
+                        rooms_by_id[str(id)]['events'].update({item['day']: []})
+                        rooms_by_id[str(id)]['events'][item['day']].append(item)
+                    print(rooms_by_id)
         return 'schedule added to the room'
     else:
         print(rooms_by_id[str(id)])
         return 'A sala ja existia na database'
 
 
-def list_days_of_week():
-    global days_of_week
-    day = date.today().strftime("%d/%m/%Y")
-    dt = datetime.strptime(day, '%d/%m/%Y')
-    start = dt - timedelta(days=dt.weekday())
-    print(str(start))
-    days_of_week.append(start.strftime('%d/%m/%Y'))
-    for i in range(4):
-        days_of_week.append((start + timedelta(days=i+1)).strftime('%d/%m/%Y'))
-    print(days_of_week)
-
-
 if __name__ == '__main__':
-    list_days_of_week()
     app.run()
