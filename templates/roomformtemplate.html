@@ -3,17 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <title>Author Name</title>
+    <style>
+        h1 { color: #111; font-family: 'Helvetica Neue', sans-serif; font-size: 15px; font-weight: bold; letter-spacing: -1px; line-height: 1; text-align: center; }
+        input[type=text] { border: 2px solid red; border-radius: 4px; text-align: center;}
+        input[type=button], button {
+            border: none;
+            padding: 8px 15px 8px 15px;
+            background: #FF8500;
+            color: #fff;
+            box-shadow: 1px 1px 4px #DADADA;
+            -moz-box-shadow: 1px 1px 4px #DADADA;
+            -webkit-box-shadow: 1px 1px 4px #DADADA;
+            border-radius: 3px;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+        }
+
+        div.form, div.InitialpageButtons,div.MainPageButton {display: block;text-align: center;}
+        form {
+            display: inline-block;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left;
+        }
+
+    </style>
 </head>
+
 <body>
 
-<h1> Room information</h1>
-<form action="#"   onsubmit="location.href = document.getElementById('f1').value +   document.getElementById('q').value; return false">
-    Rooms ID:<input type="text" id="q" name="f2">
-    <input type="submit" value="go">
-    <input type=hidden id=f1 name=f1 value="http://127.0.0.1:5000/spaces/">
-</form>
+<div class="InitialpageButtons" id="InitialpageButtons">
+    <button onclick="showIDandDay()">ID and day</button>
+    <button onclick="showID()">ID</button>
+</div>
 
-<a href="/">MainPage</a>
+<div id="RoomInformation" style="display:none">
+    <div class="form" id="RoomSchedule">
+    <h1> Room information</h1>
+    <form>
+        Rooms ID:<input type="text" id="q" placeholder="ID" name="q">
+        <input type="button" value="room ID" onClick="parent.location='http://127.0.0.1:5000/spaces/'+ document.getElementById('q').value ">
+    </form>
+    </div>
+
+    <div class="form" id="RoomDaySchedule">
+    <h1> Room information</h1>
+    <form>
+        Rooms ID and Day:<input type="text" id="q1" placeholder="ID/dd/mm/yyyy"  name="q1">
+        <input type="button" value="room day ID" onClick="parent.location='http://127.0.0.1:5000/spaces/'+ document.getElementById('q1').value ">
+    {#    <input type=hidden id=f1 name=url_spaces value="http://127.0.0.1:5000/spaces/"> {# the value will be stored at f1, hidden #}
+    </form>
+    </div>
+</div>
+
+<div class="MainPageButton" id="MainPageButton">
+    <input type="button" value="MainPage" onClick="parent.location='/'">
+</div>
+
+
+<script>
+
+function showIDandDay() {
+    document.getElementById('RoomInformation').style.display = "block"
+    document.getElementById('RoomDaySchedule').style.display = "block"
+    document.getElementById('RoomSchedule').style.display = "none"
+}
+
+function showID() {
+    document.getElementById('RoomInformation').style.display = "block"
+    document.getElementById('RoomDaySchedule').style.display = "none"
+    document.getElementById('RoomSchedule').style.display = "block"
+}
+</script>
+
+
+
+{#<h1> Canteen </h1>#}
+{#<form action="#"   onsubmit="location.href = document.getElementById('f1').value +   document.getElementById('q').value; return false">#}
+{#    day(dd/mm/yyyy):<input type="text" id="q" name="f2">#}
+{#    <input type="submit" value="go">#}
+{#    <input type=hidden id=f1 name=f1 value="http://127.0.0.1:5001/canteen/">#}
+{#</form>#}
+
+{# var x = document.getElementById("RoomSchedule");#}
+{#  var y = document.getElementById("RoomDaySchedule");#}
+{#  if (x.style.display == "none" || y.style.display == "none" ) {#}
+{#    x.style.display = "block";#}
+{#    y.style.display = "none";#}
+{#  } else {#}
+{#    y.style.display = "block";#}
+{#    x.style.display = "none";#}
+{#  }#}
+
+
 
 </body>
 </html>

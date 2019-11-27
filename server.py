@@ -1,4 +1,5 @@
 import json
+from flask import render_template
 
 namespace={'rooms': 'http://127.0.0.1:5002/spaces/' , 'canteen': 'http://127.0.0.1:5001/canteen/'}
 
@@ -7,6 +8,10 @@ from flask import jsonify
 import requests
 
 app = Flask(__name__)
+
+@app.route('/')
+def mainpagerooms():
+    return render_template("roomformtemplate.html")
 
 @app.route('/spaces/<id>', methods=['GET'])
 def get_space_api(id):

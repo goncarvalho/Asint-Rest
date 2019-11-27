@@ -14,10 +14,6 @@ rooms_by_id = {}
 ids = {}
 
 
-@app.route('/')
-def mainpagerooms():
-    return render_template("roomformtemplate.html")
-
 @app.route('/spaces/<id>/<day>/<month>/<year>', methods=['GET'])
 def get_space_day(id,day,month,year):
     response = get_spaces(id, day,month,year)
@@ -29,48 +25,80 @@ def get_space_day(id,day,month,year):
 @app.route('/spaces/<id>', methods=['GET'])
 def get_spaces(id, day = None,month = None,year=None):
     global ids
+    # if day != None and month != None and year != None:
+    #     if str(id) in ids.keys():
+    #         if str(day + '/'+ month + '/'+year) in ids[str(id)]:
+    #             print (rooms_by_id[str(id)]['events'][str(day + '/'+ month + '/'+year)])
+    #             resp = jsonify(rooms_by_id[str(id)]['events'][str(day + '/' + month + '/' + year)])
+    #             return resp
+    #         else:
+    #             ids[str(id)]+list_days_of_week(str(day + '/'+ month + '/'+year))
+    #             data = requests.get(url_spaces + '/' + str(id) + '?day=' + str(day + '/'+ month + '/'+year))
+    #             room_info = data.json()
+    #             save_into_database(room_info, id)
+    #             resp = jsonify(rooms_by_id[str(id)]['events'][str(day + '/' + month + '/' + year)])
+    #             return resp
+    #
+    #     else:
+    #         ids[str(id)]=list_days_of_week(str(day + '/'+ month + '/'+year))
+    #         data = requests.get(url_spaces + '/' + str(id) + '?day=' + str(day + '/' + month + '/' + year))
+    #         room_info = data.json()
+    #         save_into_database(room_info,id)
+    #         resp = jsonify(rooms_by_id[str(id)]['events'][str(day + '/'+ month + '/'+year)])
+    #         return resp
+    #
+    # else:
+    #     # data = requests.get(url_spaces + '/' + str(id))
+    #     # room_info = data.json()
+    #     if str(id) in ids.keys():
+    #         if date.today().strftime("%d/%m/%Y") in ids[str(id)]:
+    #             print(rooms_by_id[str(id)])
+    #         else:
+    #             ids[str(id)]+list_days_of_week(date.today().strftime("%d/%m/%Y"))
+    #             data = requests.get(url_spaces + '/' + str(id))
+    #             room_info = data.json()
+    #             save_into_database(room_info,id)
+    #             print("HEYy")
+    #     else:
+    #         ids[str(id)] = list_days_of_week(date.today().strftime("%d/%m/%Y"))
+    #         data = requests.get(url_spaces + '/' + str(id))
+    #         room_info = data.json()
+    #         save_into_database(room_info, id)
+    #         print(ids)
+    # resp = jsonify(rooms_by_id[str(id)])
+    # return resp
+
     if day != None and month != None and year != None:
         if str(id) in ids.keys():
-            if str(day + '/'+ month + '/'+year) in ids[str(id)]:
-                print (rooms_by_id[str(id)]['events'][str(day + '/'+ month + '/'+year)])
-                resp = jsonify(rooms_by_id[str(id)]['events'][str(day + '/' + month + '/' + year)])
-                return resp
-            else:
+            if str(day + '/'+ month + '/'+year) not in ids[str(id)]:
                 ids[str(id)]+list_days_of_week(str(day + '/'+ month + '/'+year))
                 data = requests.get(url_spaces + '/' + str(id) + '?day=' + str(day + '/'+ month + '/'+year))
                 room_info = data.json()
                 save_into_database(room_info, id)
-                resp = jsonify(rooms_by_id[str(id)]['events'][str(day + '/' + month + '/' + year)])
-                return resp
-
         else:
             ids[str(id)]=list_days_of_week(str(day + '/'+ month + '/'+year))
             data = requests.get(url_spaces + '/' + str(id) + '?day=' + str(day + '/' + month + '/' + year))
             room_info = data.json()
             save_into_database(room_info,id)
-            resp = jsonify(rooms_by_id[str(id)]['events'][str(day + '/'+ month + '/'+year)])
-            return resp
-
+        resp = jsonify(rooms_by_id[str(id)]['events'][str(day + '/'+ month + '/'+year)])
+        return resp
     else:
-        # data = requests.get(url_spaces + '/' + str(id))
-        # room_info = data.json()
         if str(id) in ids.keys():
-            if date.today().strftime("%d/%m/%Y") in ids[str(id)]:
-                print(rooms_by_id[str(id)])
-            else:
+            if date.today().strftime("%d/%m/%Y") not in ids[str(id)]:
                 ids[str(id)]+list_days_of_week(date.today().strftime("%d/%m/%Y"))
                 data = requests.get(url_spaces + '/' + str(id))
                 room_info = data.json()
-                save_into_database(room_info,id)
-                print("HEYy")
+                save_into_database(room_info, id)
         else:
             ids[str(id)] = list_days_of_week(date.today().strftime("%d/%m/%Y"))
             data = requests.get(url_spaces + '/' + str(id))
             room_info = data.json()
             save_into_database(room_info, id)
-            print(ids)
-    resp = jsonify(rooms_by_id[str(id)])
-    return resp
+        resp = jsonify(rooms_by_id[str(id)])
+        return resp
+
+
+
 
 def save_into_database(room_info, id):
     global rooms_by_id
@@ -93,6 +121,7 @@ def save_into_database(room_info, id):
             print(rooms_by_id)
     else:
         return 404
+
 def list_days_of_week(day):
     global days_of_week
     #day = date.today().strftime("%d/%m/%Y")
