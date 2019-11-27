@@ -1,6 +1,6 @@
 from flask import Flask
 import json
-from flask import render_template
+from flask import jsonify
 from datetime import date
 from datetime import datetime, timedelta
 import requests
@@ -28,7 +28,7 @@ def get_weekly_meal():
             weekly_meal[item['day']] = item['meal']
         for days in days_of_week:
             print(weekly_meal[days])
-        return "NICE"
+        return jsonify(weekly_meal)
 
 
 @app.route('/canteen/<day>/<month>/<year>', methods=['GET'])
@@ -58,4 +58,4 @@ def list_days_of_week():
 
 if __name__ == '__main__':
     list_days_of_week()
-    app.run()
+    app.run(port=5001)
