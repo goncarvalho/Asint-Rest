@@ -17,14 +17,16 @@
             border-radius: 3px;
             -webkit-border-radius: 3px;
             -moz-border-radius: 3px;
+            margin-bottom:5px
         }
 
-        div.form, div.InitialpageButtons,div.MainPageButton {display: block;text-align: center;}
+        div.form ,div.MainPageButton, div.MicroServersButtons, div.InitialCanteenButtons {display: block;text-align: center; margin-bottom:5px}
         form {
             display: inline-block;
             margin-left: auto;
             margin-right: auto;
             text-align: left;
+            margin-bottom:5px
         }
 
     </style>
@@ -32,10 +34,24 @@
 
 <body>
 
-<div class="InitialpageButtons" id="InitialpageButtons">
+<div class="MicroServersButtons" id="MicroServersButtons">
+    <button onclick="ShowRoomButtons()">Room Information</button>
+    <button onclick="ShowCanteenButtons()">Canteen Information</button>
+</div>
+
+
+<div class="InitialSpacesButtons" id="InitialSpacesButtons" style="display:none">
     <button onclick="showIDandDay()">ID and day</button>
     <button onclick="showID()">ID</button>
 </div>
+
+{#Buttons for canteen actions#}
+
+<div class="InitialCanteenButtons" id="InitialCanteenButtons" style="display:none">
+    <button onclick="showCanteenDay()">Canteen Day Menu</button>
+    <button onclick="parent.location='http://127.0.0.1:5000/canteen/'">Current Week Menu</button>
+</div>
+
 
 <div id="RoomInformation" style="display:none">
     <div class="form" id="RoomSchedule">
@@ -56,44 +72,68 @@
     </div>
 </div>
 
-<div class="MainPageButton" id="MainPageButton">
-    <input type="button" value="MainPage" onClick="parent.location='/'">
+
+{#Realted to Canteen buttons and actions#}
+
+<div class="form" id="CanteenScheduleByDay" style="display:none">
+            <h1> Canteen Information</h1>
+            <form>
+                Canteen Day:<input type="text" id="q1" placeholder="dd/mm/yyyy"  name="q1">
+                <input type="button" value="Canteen day" onClick="parent.location='http://127.0.0.1:5000/canteen/'+ document.getElementById('q1').value ">
+            </form>
 </div>
 
 
+
+<div class="MainPageButton" id="MainPageButton" style="display:none" >
+    <input type="button" value="MainPage" onClick="parent.location='/'">
+</div>
+
 <script>
+
+function ShowRoomButtons() {
+    document.getElementById('InitialSpacesButtons').style.display = "block"
+    document.getElementById('MicroServersButtons').style.display = "none"
+    document.getElementById('MainPageButton').style.display = "block"
+
+
+}
+
+function ShowCanteenButtons() {
+    document.getElementById('InitialCanteenButtons').style.display = "block"
+
+    {#mainpage button after exiting main page#}
+    document.getElementById('MicroServersButtons').style.display = "none"
+    document.getElementById('MainPageButton').style.display = "block"
+}
+
+function showCanteenDay() {
+    var x = document.getElementById("CanteenScheduleByDay");
+    if (x.style.display === "none") {
+         x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+    document.getElementById('MainPageButton').style.display = "block"
+}
+
 
 function showIDandDay() {
     document.getElementById('RoomInformation').style.display = "block"
     document.getElementById('RoomDaySchedule').style.display = "block"
     document.getElementById('RoomSchedule').style.display = "none"
+    document.getElementById('MainPageButton').style.display = "block"
 }
 
 function showID() {
     document.getElementById('RoomInformation').style.display = "block"
     document.getElementById('RoomDaySchedule').style.display = "none"
     document.getElementById('RoomSchedule').style.display = "block"
+    document.getElementById('MainPageButton').style.display = "block"
 }
+
+
 </script>
-
-
-
-{#<h1> Canteen </h1>#}
-{#<form action="#"   onsubmit="location.href = document.getElementById('f1').value +   document.getElementById('q').value; return false">#}
-{#    day(dd/mm/yyyy):<input type="text" id="q" name="f2">#}
-{#    <input type="submit" value="go">#}
-{#    <input type=hidden id=f1 name=f1 value="http://127.0.0.1:5001/canteen/">#}
-{#</form>#}
-
-{# var x = document.getElementById("RoomSchedule");#}
-{#  var y = document.getElementById("RoomDaySchedule");#}
-{#  if (x.style.display == "none" || y.style.display == "none" ) {#}
-{#    x.style.display = "block";#}
-{#    y.style.display = "none";#}
-{#  } else {#}
-{#    y.style.display = "block";#}
-{#    x.style.display = "none";#}
-{#  }#}
 
 
 

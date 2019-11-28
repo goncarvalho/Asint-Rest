@@ -29,7 +29,7 @@ def get_space_api_day(id, day, month, year):
 def get_canteen_api():
     r = requests.get(namespace['canteen'])
     data = r.json()
-    return jsonify(data)
+    return render_template("WeeklyCanteenTemplate.html", weekly_menu=data)
 
 if __name__ == '__main__':
     app.run()

@@ -4,6 +4,7 @@ from flask import jsonify
 from datetime import date
 from datetime import datetime, timedelta
 import requests
+from collections import OrderedDict
 from operator import itemgetter
 
 url_canteen = str('https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen')
@@ -26,8 +27,6 @@ def get_weekly_meal():
         data = requests.get(url_canteen)
         for item in data.json():
             weekly_meal[item['day']] = item['meal']
-        for days in days_of_week:
-            print(weekly_meal[days])
         return jsonify(weekly_meal)
 
 
@@ -53,7 +52,7 @@ def list_days_of_week():
     days_of_week.append(start.strftime('%d/%m/%Y'))
     for i in range(4):
         days_of_week.append((start + timedelta(days=i+1)).strftime('%d/%m/%Y'))
-    print(days_of_week)
+    #print(days_of_week)
 
 
 if __name__ == '__main__':
