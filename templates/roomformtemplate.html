@@ -20,7 +20,7 @@
             margin-bottom:5px
         }
 
-        div.form ,div.MainPageButton, div.MicroServersButtons, div.InitialCanteenButtons {display: block;text-align: center; margin-bottom:5px}
+        div.form ,div.MainPageButton, div.MicroServersButtons, div.InitialCanteenButtons, div.InitialSpacesButtons {display: block;text-align: center; margin-bottom:5px}
         form {
             display: inline-block;
             margin-left: auto;
@@ -78,8 +78,8 @@
 <div class="form" id="CanteenScheduleByDay" style="display:none">
             <h1> Canteen Information</h1>
             <form>
-                Canteen Day:<input type="text" id="q1" placeholder="dd/mm/yyyy"  name="q1">
-                <input type="button" value="Canteen day" onClick="parent.location='http://127.0.0.1:5000/canteen/'+ document.getElementById('q1').value ">
+                Canteen Day:<input type="text" id="daymeal" placeholder="dd/mm/yyyy"  name="daymeal">
+                <input type="button" value="Canteen day" onClick="parent.location='http://127.0.0.1:5000/canteen/'+ document.getElementById('daymeal').value ">
             </form>
 </div>
 

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 import json
 from flask import jsonify
 from datetime import date
@@ -10,7 +10,6 @@ from operator import itemgetter
 url_canteen = str('https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen')
 url_canteen_day = str('https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen?day=')
 weekly_meal = {}  # global list
-days_of_week = []
 
 app = Flask(__name__)
 
@@ -19,42 +18,31 @@ app = Flask(__name__)
 @app.route('/canteen', methods=['GET'])
 def get_weekly_meal():
     global weekly_meal
-    try:
-        for days in days_of_week:
-            print(weekly_meal[days])
-        return 'ok'
-    except:
+    if date.today().strftime("%d/%m/%Y") in weekly_meal.keys():
+        return jsonify(weekly_meal )
+    else:
         data = requests.get(url_canteen)
         for item in data.json():
             weekly_meal[item['day']] = item['meal']
         return jsonify(weekly_meal)
 
-
 @app.route('/canteen/<day>/<month>/<year>', methods=['GET'])
 def check_meal(day, month, year):
     global weekly_meal
+    if day[0:1] == '0':
+        day=day[1:2]
     try:
-        print(weekly_meal[str(day + '/' + month + '/' + year)])
+        return jsonify(weekly_meal[str(day + '/' + month + '/' + year)])
     except:
-        data = requests.get(url_canteen_day+str(day + '/' + month + '/' + year))
+        print(url_canteen_day + str(day + '/' + month + '/' + year))
+        data = requests.get(url_canteen_day + str(day + '/' + month + '/' + year))
+        if data.text =='[]':
+            return jsonify({'errorCode' : 404, 'message' : 'Route not found'})
         for item in data.json():
             weekly_meal[item['day']] = item['meal']
-        print(weekly_meal[str(day + '/' + month + '/' + year)])
-        return "added nex week"
+        return jsonify(weekly_meal[str(day + '/' + month + '/' + year)])
 
-
-def list_days_of_week():
-    global days_of_week
-    day = date.today().strftime("%d/%m/%Y")
-    dt = datetime.strptime(day, '%d/%m/%Y')
-    start = dt - timedelta(days=dt.weekday())
-    print(str(start))
-    days_of_week.append(start.strftime('%d/%m/%Y'))
-    for i in range(4):
-        days_of_week.append((start + timedelta(days=i+1)).strftime('%d/%m/%Y'))
-    #print(days_of_week)
 
 
 if __name__ == '__main__':
-    list_days_of_week()
     app.run(port=5001)
