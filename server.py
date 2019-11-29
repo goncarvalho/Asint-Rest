@@ -1,13 +1,10 @@
-import json
-from flask import render_template
+from flask import render_template, redirect, Flask, jsonify
 from datetime import date
 from datetime import datetime, timedelta
+import requests
 namespace = {'rooms': 'http://127.0.0.1:5002/spaces/', 'canteen': 'http://127.0.0.1:5001/canteen/',
              'secretariats': 'http://127.0.0.1:5003/secretariat/'}
 
-from flask import Flask
-from flask import jsonify
-import requests
 
 days_of_week = []
 
@@ -54,6 +51,14 @@ def get_canteen_day_api(day, month, year):
             return meal_not_found(404)
     except:
         return render_template("WeeklyCanteenTemplate.html", weekly_menu=data)
+
+
+@app.route('/admin', methods=['GET'])
+@app.route('/admin/', methods=['GET'])
+def launch_admin():
+
+    # authenticate user first before rendering html with administration tools
+    return NotImplementedError
 
 
 def list_days_of_week():
