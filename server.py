@@ -2,7 +2,8 @@ import json
 from flask import render_template
 from datetime import date
 from datetime import datetime, timedelta
-namespace = {'rooms': 'http://127.0.0.1:5002/spaces/', 'canteen': 'http://127.0.0.1:5001/canteen/'}
+namespace = {'rooms': 'http://127.0.0.1:5002/spaces/', 'canteen': 'http://127.0.0.1:5001/canteen/',
+             'secretariats': 'http://127.0.0.1:5003/secretariat/'}
 
 from flask import Flask
 from flask import jsonify
@@ -65,6 +66,7 @@ def list_days_of_week():
     for i in range(4):
         days_of_week.append((start + timedelta(days=i + 1)).strftime('%d/%m/%Y'))
     # print(days_of_week)
+
 
 if __name__ == '__main__':
     list_days_of_week()
