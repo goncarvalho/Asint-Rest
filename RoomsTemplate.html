@@ -12,7 +12,7 @@
 <body>
 <h1>Weekly Menu </h1>
 
-{% for item in days_of_week %}
+{% for item in weekly_menu %}
     <ul>
         <p style="color: #7c795d; font-family: 'Trocchi', serif; font-size: 36px; font-weight: normal; line-height: 48px; margin: 0; ">{{item}}</p>
         {% for i in range(weekly_menu[item]|length) %}

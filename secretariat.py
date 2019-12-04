@@ -1,7 +1,7 @@
 from flask import  Flask, request, jsonify
 import json
+import pickle
 
-office = {}
 
 app = Flask(__name__)
 
@@ -10,7 +10,7 @@ app = Flask(__name__)
 @app.route('/secretariat/<ident>', methods=['GET'])
 def get_office(ident):
 
-    return jsonify(office[ident])
+    return jsonify(offices[ident])
 
 
 @app.route('/secretariat/edit/', methods=['POST'])
@@ -22,7 +22,7 @@ def edit_office():
 
     try:
         for key in new_office:
-            office[new_office['name']].key = new_office[key]
+            offices[new_office['name']].key = new_office[key]
     except KeyError:
         return 400
 
@@ -32,7 +32,7 @@ def edit_office():
 def delete_office(name):
 
     try:
-        office.pop(name)
+        offices.pop(name)
     except KeyError:
         return 400
 
@@ -45,7 +45,7 @@ def add_office():
     new_office = json.loads(content)
 
     try:
-        office[new_office['name']] = Office(new_office['name'],     new_office['operating_hours'],
+        offices[new_office['name']] = Office(new_office['name'],     new_office['operating_hours'],
                                             new_office['location'], new_office['description'])
     except KeyError:
         return 400
@@ -61,4 +61,15 @@ class Office:
 
 
 if __name__ == '__main__':
-    app.run(port=5003)
+
+    try:
+        with open('secretariates.pkl', 'rb') as f:
+            offices = pickle.load(f)
+        f.close()
+    except:
+        offices = {}
+    try:
+        app.run(port=5003)
+    except:
+        with open('secretariates.pkl', 'wb') as f:
+            pickle.dump(offices, f)

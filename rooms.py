@@ -14,31 +14,30 @@ rooms_by_id = {}
 ids = {}
 
 
-@app.route('/spaces/<ident>/<day>/<month>/<year>', methods=['GET'])
-def get_space_day(ident, day, month, year):
-    response = get_spaces(ident, day, month, year)
+@app.route('/spaces/<ident>/<path:date>', methods=['GET'])
+def get_space_day(ident, date):
+    response = get_spaces(ident, date)
     return response
 
 
 # id FA1 2448131363667
 @app.route('/spaces/<ident>/', methods=['GET'])
 @app.route('/spaces/<ident>', methods=['GET'])
-def get_spaces(ident, day=None, month=None, year=None):
+def get_spaces(ident, day = None):
     global ids
-    if day is not None and month is not None and year is not None:
+    if day is not None:
         if str(ident) in ids.keys():
-            if str(day + '/' + month + '/'+year) not in ids[str(ident)]:
-                ids[str(ident)]+list_days_of_week(str(day + '/' + month + '/' + year))
-                data = requests.get(url_spaces + '/' + str(ident) + '?day=' + str(day + '/' + month + '/' + year))
+            if day not in ids[str(ident)]:
+                ids[str(ident)]+list_days_of_week(day)
+                data = requests.get(url_spaces + '/' + str(ident) + '?day=' + day)
                 room_info = data.json()
                 save_into_database(room_info, ident)
         else:
-            ids[str(ident)] = list_days_of_week(str(day + '/' + month + '/' + year))
-            data = requests.get(url_spaces + '/' + str(ident) + '?day=' + str(day + '/' + month + '/' + year))
+            ids[str(ident)] = list_days_of_week(date)
+            data = requests.get(url_spaces + '/' + str(ident) + '?day=' + day)
             room_info = data.json()
             save_into_database(room_info, ident)
-        resp = jsonify(rooms_by_id[str(ident)]['events'][str(day + '/' + month + '/' + year)])
-        return resp
+        return jsonify(rooms_by_id[str(ident)]['events'][day])
     else:
         if str(ident) in ids.keys():
             if date.today().strftime("%d/%m/%Y") not in ids[str(ident)]:
@@ -51,8 +50,7 @@ def get_spaces(ident, day=None, month=None, year=None):
             data = requests.get(url_spaces + '/' + str(ident))
             room_info = data.json()
             save_into_database(room_info, ident)
-        resp = jsonify(rooms_by_id[str(ident)])
-        return resp
+        return jsonify(rooms_by_id[str(ident)])
 
 
 def save_into_database(room_info, ident):
