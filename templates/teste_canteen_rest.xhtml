@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Title</title>
+
+        <script type="text/javascript">
+        //<![CDATA[
+        
+        
+         function reqResponse() {
+             console.log(this.responseText);
+             weekly_menu = JSON.parse(this.responseText);
+
+             s="<ol>";
+             var i =0;
+             var len = Object.keys(weekly_menu).length
+             for (var key in weekly_menu )  {
+                s+= "<li>";
+                s += key;
+                s+= "</li>";
+                for ( var j=0 ; j < Object.keys(weekly_menu[key]).length;j++){
+                    s+= "<li>";
+                    s+= weekly_menu[key][j]["type"];
+                    s+= "</li>";
+                }
+
+
+             }
+             s+="</ol>";
+             document.getElementById('divDestiny').innerHTML =s;
+         }
+         function get_canteen() {
+
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.addEventListener("load", reqResponse);
+            xmlHttp.open( "GET", '/canteen/', false ); // false for synchronous request
+            xmlHttp.send( null );
+
+        }
+        //]]>
+  </script>
+</head>
+<body>
+
+    <h1>Input a search term</h1>
+
+
+        <input type="button" value="Search"  onclick="get_canteen()" id="searchText"/>
+        <div id="divDestiny">(this is where the text will go)</div>
+
+</body>
+</html>
