@@ -57,6 +57,14 @@ def remove_secretariat_api():
         r = requests.post(namespace['api'] +  'secretariat' + '/delete/ident', request.form)
         return render_template('ShowSecretariatesAfterRemove.html', secretariate_added = r.json())
 
+
+@app.route('/secretariat/edit', methods=['POST'])
+def edit_secretariat_api():
+    if request.method == "POST":
+        r = requests.post(namespace['api'] + 'secretariat' + '/edit', request.form)
+        return render_template('AddSecretariateResponse.html', secretariate_added=r.json())
+
+
 @app.route('/canteen/', methods=['GET'])
 def get_canteen_api():
     r = requests.get(namespace['api'] + 'canteen')

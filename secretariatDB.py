@@ -19,15 +19,16 @@ def get_office():
 @app.route('/secretariat/edit/', methods=['POST'])
 @app.route('/secretariat/edit', methods=['POST'])
 def edit_office():
+    if len(offices) == 0 :
+        return " There are no Office infrmation yet"
+    if request.method == "POST":
+        ident=request.form['ident']
+    for key in request.form :
+        if len(request.form[key]) != 0 :
+            offices[ident].__dict__[key] = request.form[key]
+    #[offices[ident].__dict__[key] for key in request.form]
+    return jsonify(offices[ident].__dict__)
 
-    content = request.json
-    new_office = json.loads(content)
-
-    try:
-        for key in new_office:
-            offices[new_office['name']].key = new_office[key]
-    except KeyError:
-        return 400
 
 
 @app.route('/secretariat/delete/ident/', methods=['POST'])
