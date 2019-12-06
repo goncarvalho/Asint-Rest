@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ementa</title>
+    <style>
+        body{
+            background: #ffffff; text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<h1>Weekly Menu </h1>
+
+
+{% for day in days_of_week %}
+    <p>{{ day }}</p>
+        {% for i in rooms_events['events'][day] %}
+            <p>{{ i['type'] }}</p>
+            <ul>
+                {% if i['type'] == 'LESSON' %}
+                    <p>  {{ i['course']['name'] }}</p>
+                {% endif %}
+                {% if i['type'] == 'GENERIC'%}
+                    <p>{{i['title']}}</p>
+                {% endif %}
+                <p>{{ 'Time: ' + i['start'] + '-' + i['end'] }}</p>
+            </ul>
+        {% endfor %}
+{% endfor %}
+
+
+<div class="MainPageButton" id="MainPageButton" style="display:none" >
+    <input type="button" value="MainPage" onClick="parent.location='/'">
+</div>
+
+</body>
+</html>

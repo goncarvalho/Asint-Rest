@@ -33,11 +33,11 @@ def get_spaces(ident, day = None):
                 room_info = data.json()
                 save_into_database(room_info, ident)
         else:
-            ids[str(ident)] = list_days_of_week(date)
+            ids[str(ident)] = list_days_of_week(day)
             data = requests.get(url_spaces + '/' + str(ident) + '?day=' + day)
             room_info = data.json()
             save_into_database(room_info, ident)
-        return jsonify(rooms_by_id[str(ident)]['events'][day])
+        return jsonify(rooms_by_id[str(ident)])
     else:
         if str(ident) in ids.keys():
             if date.today().strftime("%d/%m/%Y") not in ids[str(ident)]:

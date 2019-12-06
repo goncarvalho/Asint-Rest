@@ -37,6 +37,7 @@
 <div class="MicroServersButtons" id="MicroServersButtons">
     <button onclick="ShowRoomButtons()">Room Information</button>
     <button onclick="ShowCanteenButtons()">Canteen Information</button>
+    <button onclick="parent.location='http://127.0.0.1:3000/secretariat/'">Secretariates Infomation</button>
 </div>
 
 
@@ -49,7 +50,7 @@
 
 <div class="InitialCanteenButtons" id="InitialCanteenButtons" style="display:none">
     <button onclick="showCanteenDay()">Canteen Day Menu</button>
-    <button onclick="parent.location='/getCanteen'">Current Week Menu</button>
+    <button onclick="parent.location='http://127.0.0.1:3000/canteen'">Current Week Menu</button>
 </div>
 
 
@@ -58,7 +59,7 @@
     <h1> Room information</h1>
     <form>
         Rooms ID:<input type="text" id="q" placeholder="ID" name="q">
-        <input type="button" value="room ID" onClick="parent.location='http://127.0.0.1:5000/spaces/'+ document.getElementById('q').value ">
+        <input type="button" value="room ID" onClick="parent.location='http://127.0.0.1:3000/spaces/'+ document.getElementById('q').value ">
     </form>
     </div>
 
@@ -66,7 +67,7 @@
     <h1> Room information</h1>
     <form>
         Rooms ID and Day:<input type="text" id="q1" placeholder="ID/dd/mm/yyyy"  name="q1">
-        <input type="button" value="room day ID" onClick="parent.location='http://127.0.0.1:5000/spaces/'+ document.getElementById('q1').value ">
+        <input type="button" value="room day ID" onClick="parent.location='http://127.0.0.1:3000/spaces/'+ document.getElementById('q1').value ">
     {#    <input type=hidden id=f1 name=url_spaces value="http://127.0.0.1:5000/spaces/"> {# the value will be stored at f1, hidden #}
     </form>
     </div>
@@ -79,7 +80,7 @@
             <h1> Canteen Information</h1>
             <form>
                 Canteen Day:<input type="text" id="daymeal" placeholder="dd/mm/yyyy"  name="daymeal">
-                <input type="button" value="Canteen day" onClick="parent.location='http://127.0.0.1:5000/canteen/'+ document.getElementById('daymeal').value ">
+                <input type="button" value="Canteen day" onClick="parent.location='http://127.0.0.1:3000/canteen/'+ document.getElementById('daymeal').value ">
             </form>
 </div>
 
