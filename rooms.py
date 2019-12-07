@@ -71,7 +71,6 @@ def save_into_database(room_info, ident):
             else:
                 rooms_by_id[str(ident)]['events'].update({item['day']: []})
                 rooms_by_id[str(ident)]['events'][item['day']].append(item)
-            print(rooms_by_id)
     else:
         return 404
 
@@ -81,7 +80,6 @@ def list_days_of_week(day):
     #day = date.today().strftime("%d/%m/%Y")
     dt = datetime.strptime(day, '%d/%m/%Y')
     start = dt - timedelta(days=dt.weekday())
-    print(str(start))
     days_of_week.append(start.strftime('%d/%m/%Y'))
     for i in range(4):
         days_of_week.append((start + timedelta(days=i+1)).strftime('%d/%m/%Y'))
