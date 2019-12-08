@@ -1,7 +1,8 @@
 from datetime import date
 from datetime import datetime, timedelta
 
-import logging.config
+import logging
+from time import strftime
 
 from flask import render_template, redirect, Flask, jsonify, request, Response, url_for, abort, session
 from flask_principal import Principal, Identity, Permission, RoleNeed, identity_loaded, identity_changed, \
@@ -11,6 +12,14 @@ import requests
 namespace = {'logs': 'http://127.0.0.1:4001/', 'spaces': 'http://127.0.0.1:5002/', 'canteen': 'http://127.0.0.1:5001/',
              'secretariat': 'http://127.0.0.1:5003/', 'server': 'http://127.0.0.1:5000/'}
 
+logger = logging.getLogger('serverlog')
+logger.setLevel(logging.INFO)
+# %(remote_addr)s used %(method)s about %(full_path)s with %(status_code)s
+formatter = logging.Formatter('%(levelname)s - %(name)s - [%(asctime)s] - %(message)s')
+
+file_handler = logging.FileHandler('server.log')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 class User:
     def __init__(self, ident, password, roles, token=None):
@@ -20,10 +29,11 @@ class User:
         self.token = token
 
 
+
+
 # Flask
 app = Flask(__name__)
 app.secret_key = "super secret key"
-logger = logging.getLogger("myapp")
 principals = Principal(app)
 admin_permission = Permission(RoleNeed('administrator'))
 fenix_permission = Permission(RoleNeed('fenix'))
@@ -72,11 +82,13 @@ def main_page():
 # Login page
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+
     if request.method == 'POST':
         username = request.form['username']
 
         if username == 'guest':
             identity_changed.send(app, identity=Identity("guest"))
+            logger.info('New guest session')
             return redirect(session['redirected_from'])
 
         elif username == 'fenix':
@@ -139,8 +151,11 @@ def fenix_authentication():
 
 @app.errorhandler(403)
 def page_not_found(e):
-    session['redirected_from'] = request.url
-    return redirect(url_for('login'))
+    try:
+        logout()
+    finally:
+        session['redirected_from'] = request.url
+        return redirect(url_for('login'))
 
 
 @app.errorhandler(404)
@@ -151,6 +166,12 @@ def not_found(error):
 @app.route('/resources/spaces/<path:id>', methods=['GET'])
 def get_space_api(id):
     r = requests.get(namespace['server'] + 'spaces' + '/' + id)
+    logger.info(
+        '{} - - Room ID = {} Schedule using {} in {} with response code {}'.format(request.remote_addr,
+                                                                                              id,
+                                                                                              request.method,
+                                                                                              request.full_path,
+                                                                                              r.status_code))
     data = r.json()
     return render_template("RoomsTemplate.html", rooms_events = data, days_of_week = days_of_week)
 
@@ -158,6 +179,12 @@ def get_space_api(id):
 @app.route('/resources/spaces/<id>/<path:date>', methods=['GET'])
 def get_space_api_day(id,date):
     r = requests.get(namespace['server'] + 'spaces' + '/' + str(id) + '/' + date)
+    logger.info(
+        '{} - - Room ID = {} Schedule for day {} using {} in {} with response code {}'.format(request.remote_addr,
+                                                                                              id,date,
+                                                                                              request.method,
+                                                                                              request.full_path,
+                                                                                              r.status_code))
     data = r.json()
     return render_template("RoomsTemplate.html", rooms_events = data, days_of_week = [date])
 
@@ -168,7 +195,7 @@ def render_secretariates():
 
 
 @app.route('/resources/secretariat/add', methods=['POST'])
-@admin_permission.require()
+@admin_permission.require(http_exception=403)
 def add_secretariat():
     if request.method == "POST":
         r = requests.post(namespace['server'] +  'secretariat' + '/add', request.form)
@@ -179,11 +206,17 @@ def add_secretariat():
 def show_secretariat():
     if request.method == "POST":
         r = requests.post(namespace['server'] + 'secretariat' + '/ident', request.form)
+        logger.info(
+            '{} - - Secretariate ID = {} Information using {} in {} with response code {}'.format(request.remote_addr,
+                                                                                             request.form['ident'],
+                                                                                             request.method,
+                                                                                             request.full_path,
+                                                                                             r.status_code))
         return render_template('ShowSecretariate_id.html', secretariateid = r.json())
 
 
 @app.route('/resources/secretariat/delete/ident', methods=['POST'])
-@admin_permission.require()
+@admin_permission.require(http_exception=403)
 def remove_secretariat():
     if request.method == "POST":
         r = requests.post(namespace['server'] + 'secretariat' + '/delete/ident', request.form)
@@ -191,7 +224,7 @@ def remove_secretariat():
 
 
 @app.route('/resources/secretariat/edit', methods=['POST'])
-@admin_permission.require()
+@admin_permission.require(http_exception=403)
 def edit_secretariat():
     if request.method == "POST":
         r = requests.post(namespace['server'] + 'secretariat' + '/edit', request.form)
@@ -201,13 +234,17 @@ def edit_secretariat():
 @app.route('/resources/canteen/', methods=['GET'])
 def get_canteen_():
     r = requests.get(namespace['server'] + 'canteen')
+    logger.info('{} - - Weekly Canteen Schedule using {} in {} with response code {}'.format(request.remote_addr, request.method, request.full_path, r.status_code))
     data = r.json()
     return render_template("CanteenTemplate.html", weekly_menu=data)
 
-
-@app.route('/resources/canteen/<path:date>', methods=['GET'])
+@app.route('/resources/canteen/<path:c_date>', methods=['GET'])
 def get_canteen_day(c_date):
     r = requests.get(namespace['server'] + 'canteen' + '/' + c_date)
+    logger.info('{} - - Canteen Schedule for day {} using {} in {} with response code {}'.format(request.remote_addr, c_date,
+                                                                                             request.method,
+                                                                                             request.full_path,
+                                                                                             r.status_code))
     data = r.json()
     try:
         if data['errorCode'] == 404:
