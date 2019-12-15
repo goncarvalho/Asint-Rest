@@ -1,25 +1,16 @@
 from datetime import date
 from datetime import datetime, timedelta
 
-import logging
-from time import strftime
+import random
+import string
 
 from flask import render_template, redirect, Flask, jsonify, request, Response, url_for, abort, session
 from flask_principal import Principal, Identity, Permission, RoleNeed, identity_loaded, identity_changed, \
     AnonymousIdentity
 import requests
 
-namespace = {'logs': 'http://127.0.0.1:4001/', 'spaces': 'http://127.0.0.1:5002/', 'canteen': 'http://127.0.0.1:5001/',
+namespace = {'logs': 'http://127.0.0.1:5004/', 'spaces': 'http://127.0.0.1:5002/', 'canteen': 'http://127.0.0.1:5001/',
              'secretariat': 'http://127.0.0.1:5003/', 'server': 'http://127.0.0.1:5000/'}
-
-logger = logging.getLogger('serverlog')
-logger.setLevel(logging.INFO)
-# %(remote_addr)s used %(method)s about %(full_path)s with %(status_code)s
-formatter = logging.Formatter('%(levelname)s - %(name)s - [%(asctime)s] - %(message)s')
-
-file_handler = logging.FileHandler('server.log')
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
 
 class User:
     def __init__(self, ident, password, roles, token=None):
@@ -27,9 +18,6 @@ class User:
         self.password = password
         self.roles = roles
         self.token = token
-
-
-
 
 # Flask
 app = Flask(__name__)
@@ -48,6 +36,8 @@ redirect_fenix_uri = "http://127.0.0.1:5000/istAuth"
 
 # username : User
 users = {}
+secrets = {} # TODO: entries here should expire after a certain amount of time
+secret_len = 4
 days_of_week = []
 users['administrador'] = User("administrador", "1234", ['guest', 'administrator'])
 
@@ -88,7 +78,6 @@ def login():
 
         if username == 'guest':
             identity_changed.send(app, identity=Identity("guest"))
-            logger.info('New guest session')
             return redirect(session['redirected_from'])
 
         elif username == 'fenix':
@@ -162,16 +151,45 @@ def page_not_found(e):
 def not_found(error):
     return render_template('NoInfoMeal_404.html', title='404'), 404
 
+@fenix_permission.require(http_exception=403)
+@app.route('/app/getsecret', methods=['GET'])
+def get_secret():
+
+    secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(secret_len))
+
+    secrets[secret] = session['identity.id']
+
+    return jsonify(secret)
+
+
+@fenix_permission.require(http_exception=403)
+@app.route('/validate', methods=['GET', 'POST'])
+def validate_secret():
+
+    if request.method == 'POST':
+        secret = request.form['secret']
+
+        if secret in secrets:
+            user = secrets[secret]
+            params = {'access_token': users[user].token}
+            resp = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params=params)
+            if resp.status_code == 200:
+                r_info = resp.json()
+                return jsonify(r_info)
+
+        else:
+            return jsonify("No user!")
+    else:
+        #return render_template('PostSecret.html')
+        return Response('''
+        <form action="" method="post">
+            <p><input type=text name=secret>
+        </form>
+        ''')
 
 @app.route('/resources/spaces/<path:id>', methods=['GET'])
 def get_space_api(id):
     r = requests.get(namespace['server'] + 'spaces' + '/' + id)
-    logger.info(
-        '{} - - Room ID = {} Schedule using {} in {} with response code {}'.format(request.remote_addr,
-                                                                                              id,
-                                                                                              request.method,
-                                                                                              request.full_path,
-                                                                                              r.status_code))
     data = r.json()
     return render_template("RoomsTemplate.html", rooms_events = data, days_of_week = days_of_week)
 
@@ -179,12 +197,6 @@ def get_space_api(id):
 @app.route('/resources/spaces/<id>/<path:date>', methods=['GET'])
 def get_space_api_day(id,date):
     r = requests.get(namespace['server'] + 'spaces' + '/' + str(id) + '/' + date)
-    logger.info(
-        '{} - - Room ID = {} Schedule for day {} using {} in {} with response code {}'.format(request.remote_addr,
-                                                                                              id,date,
-                                                                                              request.method,
-                                                                                              request.full_path,
-                                                                                              r.status_code))
     data = r.json()
     return render_template("RoomsTemplate.html", rooms_events = data, days_of_week = [date])
 
@@ -206,12 +218,6 @@ def add_secretariat():
 def show_secretariat():
     if request.method == "POST":
         r = requests.post(namespace['server'] + 'secretariat' + '/ident', request.form)
-        logger.info(
-            '{} - - Secretariate ID = {} Information using {} in {} with response code {}'.format(request.remote_addr,
-                                                                                             request.form['ident'],
-                                                                                             request.method,
-                                                                                             request.full_path,
-                                                                                             r.status_code))
         return render_template('ShowSecretariate_id.html', secretariateid = r.json())
 
 
@@ -234,17 +240,13 @@ def edit_secretariat():
 @app.route('/resources/canteen/', methods=['GET'])
 def get_canteen_():
     r = requests.get(namespace['server'] + 'canteen')
-    logger.info('{} - - Weekly Canteen Schedule using {} in {} with response code {}'.format(request.remote_addr, request.method, request.full_path, r.status_code))
     data = r.json()
     return render_template("CanteenTemplate.html", weekly_menu=data)
+
 
 @app.route('/resources/canteen/<path:c_date>', methods=['GET'])
 def get_canteen_day(c_date):
     r = requests.get(namespace['server'] + 'canteen' + '/' + c_date)
-    logger.info('{} - - Canteen Schedule for day {} using {} in {} with response code {}'.format(request.remote_addr, c_date,
-                                                                                             request.method,
-                                                                                             request.full_path,
-                                                                                             r.status_code))
     data = r.json()
     try:
         if data['errorCode'] == 404:
