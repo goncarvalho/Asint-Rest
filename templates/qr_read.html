@@ -3,10 +3,17 @@
   <head>
       <meta charset="UTF-8">
       <title>Instascan</title>
-      <script type="text/javascript" src="instascan.min.js" ></script>
+      <script type="text/javascript" src="{{url_for('static', filename='instascan.min.js') }}"></script>
+      <script type="text/javascript" src="{{url_for('static', filename='json-to-table.js') }}"></script>
   </head>
   <body>
+  <h1>QR Code </h1>
     <video id="preview"></video>
+
+  <h1>Result</h1>
+
+  <p id="demo"></p>
+
     <script>
         let scanner = new Instascan.Scanner(
             {
@@ -14,12 +21,14 @@
             }
         );
         scanner.addListener('scan', function(content) {
-            var client = new HttpClient();
-            client.get(content.replace("/resources/", "/"), function(response) {
-                document.write(response)
-            });
-            alert('Do you want to open this page?: ' + content);
-            window.open(content, "_blank");
+           xmlhttp = new XMLHttpRequest();
+           xmlhttp.onreadystatechange = function() {
+               if (this.readyState == 4 && this.status == 200) {
+                   document.getElementById("demo").innerHTML = ConvertJsonToTable(JSON.parse(this.responseText));
+               }
+           };
+           xmlhttp.open("GET", content.replace("/resources/", "/"), true);
+           xmlhttp.send();
         });
         Instascan.Camera.getCameras().then(cameras =>
         {
@@ -29,18 +38,6 @@
                 console.error("Please enable Camera!");
             }
         });
-
-        var HttpClient = function() {
-            this.get = function(aUrl, aCallback) {
-                var anHttpRequest = new XMLHttpRequest();
-                anHttpRequest.onreadystatechange = function() {
-                    if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-                        aCallback(anHttpRequest.responseText);
-                }
-                anHttpRequest.open( "GET", aUrl, true );
-                anHttpRequest.send( null );
-            }
-        };
     </script>
   </body>
 </html>

@@ -1,11 +1,7 @@
-from flask import Flask
-from flask import jsonify
-import json
+from flask import Flask, jsonify, request
 from datetime import date
-from flask import render_template
 from datetime import datetime, timedelta
 import requests
-from operator import itemgetter
 
 url_spaces = str('https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces')
 days_of_week = []
@@ -13,9 +9,16 @@ app = Flask(__name__)
 rooms_by_id = {}
 ids = {}
 
+namespace = {'logs': 'http://127.0.0.1:5004/addlog'}
+
 
 @app.route('/spaces/<ident>/<path:date>', methods=['GET'])
 def get_space_day(ident, date):
+
+    requests.post(namespace['logs'], json={'request': '/spaces/' + ident + '/' + date,
+                                           'user': request.host,
+                                           'timestamp': datetime.now()})
+
     response = get_spaces(ident, date)
     return response
 
@@ -23,8 +26,13 @@ def get_space_day(ident, date):
 # id FA1 2448131363667
 @app.route('/spaces/<ident>/', methods=['GET'])
 @app.route('/spaces/<ident>', methods=['GET'])
-def get_spaces(ident, day = None):
+def get_spaces(ident, day=None):
     global ids
+
+    requests.post(namespace['logs'], json={'request': '/spaces/' + ident,
+                                           'user': request.host,
+                                           'timestamp': datetime.now()})
+
     if day is not None:
         if str(ident) in ids.keys():
             if day not in ids[str(ident)]:
