@@ -9,7 +9,7 @@ try:
     with open('logs.pkl', 'rb') as f:
         (id_secretariat, offices) = pickle.load(f)
     f.close()
-except:
+except FileNotFoundError:
     logs = []
 
 
