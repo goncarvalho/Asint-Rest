@@ -14,11 +14,12 @@ import requests
 
 
 class User:
-    def __init__(self, ident, password, roles, token=None):
+    def __init__(self, ident, password, roles, secret=None, token=None):
         self.id = ident
         self.password = password
         self.roles = roles
         self.token = token
+        self.secret = secret
 
 
 # Namespace database
@@ -180,17 +181,24 @@ def page_not_found(e):
 def not_found(error):
     return render_template('NoInfoMeal_404.html', title='404'), 404
 
-@fenix_permission.require(http_exception=403)
+
 @app.route('/app/getsecret', methods=['GET'])
+@fenix_permission.require(http_exception=403)
 def get_secret():
 
     # creates random character sequence as a secret
-    secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(secret_len))
+    if users[session['identity.id']].secret is None:
+        secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(secret_len))
+        users[session['identity.id']].secret = secret
+        secrets[secret] = session['identity.id']
+    elif users[session['identity.id']].secret in secrets:
+        secret = users[session['identity.id']].secret
+    else:
+        secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(secret_len))
+        users[session['identity.id']].secret = secret
+        secrets[secret] = session['identity.id']
 
-    # caches secret
-    secrets[secret] = session['identity.id']
-
-    return jsonify(secret)
+    return render_template('getsecret.html', data=secret)
 
 
 @fenix_permission.require(http_exception=403)

@@ -54,6 +54,8 @@ def edit_office():
     for key in request.form :
         if len(request.form[key]) != 0 :
             offices[ident].__dict__[key] = request.form[key]
+    with open('secretariates.pkl', 'wb') as f:
+        pickle.dump((id_secretariat, offices), f)
     return jsonify(offices[ident].__dict__)
 
 

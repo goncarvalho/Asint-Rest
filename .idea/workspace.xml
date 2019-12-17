@@ -2,13 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="dd2f9865-b395-491d-8a80-b32dbe0d098e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/templates/getsecret.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secretariatDB.py" beforeDir="false" afterPath="$PROJECT_DIR$/secretariatDB.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Secretariate_Add_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Secretariate_Add_form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Secretariate_Edit_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Secretariate_Edit_form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Secretariate_ID_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Secretariate_ID_form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Secretariate_Remove_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Secretariate_Remove_form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/SecretariatsTemplate.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/SecretariatsTemplate.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/getsecret.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/getsecret.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -264,7 +261,7 @@
       <workItem from="1575801480598" duration="13962000" />
       <workItem from="1576058720589" duration="10674000" />
       <workItem from="1576533918574" duration="604000" />
-      <workItem from="1576534523534" duration="11941000" />
+      <workItem from="1576534523534" duration="13659000" />
     </task>
     <task id="LOCAL-00001" summary="Prints current week if we already have other weeks">
       <created>1574270605684</created>
@@ -371,7 +368,14 @@
       <option name="project" value="LOCAL" />
       <updated>1576543689329</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="aula">
+      <created>1576579069484</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1576579069484</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -394,6 +398,7 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="Prints current week if we already have other weeks" />
     <MESSAGE value="correction prints and add different and current week if we already have other weeks and" />
     <MESSAGE value="events stored by day" />
@@ -405,7 +410,8 @@
     <MESSAGE value="secretariate edit" />
     <MESSAGE value="logs" />
     <MESSAGE value="botoes, qr code , secreatariates fixed" />
-    <option name="LAST_COMMIT_MESSAGE" value="botoes, qr code , secreatariates fixed" />
+    <MESSAGE value="aula" />
+    <option name="LAST_COMMIT_MESSAGE" value="aula" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -467,7 +473,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/secretariatDB.py</url>
-          <line>56</line>
+          <line>58</line>
           <option name="timeStamp" value="150" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -620,17 +626,22 @@
           <line>53</line>
           <option name="timeStamp" value="313" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/server.py</url>
+          <line>190</line>
+          <option name="timeStamp" value="326" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Asint_Rest$Asint_Rest.coverage" NAME="Asint-Rest Coverage Results" MODIFIED="1574261051777" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Asint_Rest$Flask__canteen_py_.coverage" NAME="Flask (canteen.py) Coverage Results" MODIFIED="1574264110700" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/Asint_Rest$secretariatDB.coverage" NAME="secretariatDB Coverage Results" MODIFIED="1576576768055" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Asint_Rest$secretariatDB.coverage" NAME="secretariatDB Coverage Results" MODIFIED="1576579291153" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Asint_Rest$secretariat.coverage" NAME="secretariat Coverage Results" MODIFIED="1575581106159" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Asint_Rest$server.coverage" NAME="server Coverage Results" MODIFIED="1576577433610" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Asint_Rest$server.coverage" NAME="server Coverage Results" MODIFIED="1576580179333" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Asint_Rest$logs.coverage" NAME="logs Coverage Results" MODIFIED="1575804825046" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Asint_Rest$canteen.coverage" NAME="canteen Coverage Results" MODIFIED="1576542577526" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Asint_Rest$canteen.coverage" NAME="canteen Coverage Results" MODIFIED="1576579288678" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Asint_Rest$webpages.coverage" NAME="webpages Coverage Results" MODIFIED="1575802917836" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Asint_Rest$rooms.coverage" NAME="rooms Coverage Results" MODIFIED="1575555195619" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
