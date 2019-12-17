@@ -257,51 +257,40 @@ def get_space_api_day(ident, day):
 def render_secretariates():
     return render_template('SecretariatsTemplate.html')
 
-@app.route('/resources/secretariat/ident', methods=['POST'])
+@app.route('/resources/secretariat/ident', methods=['POST', 'GET'])
 def render_secretariate_id_form():
-    return render_template('Secretariate_ID_form.html')
-
-
-@app.route('/resources/secretariat/ident/post', methods=['POST'])
-def show_secretariat():
+    if request.method == 'GET':
+        return render_template('Secretariate_ID_form.html')
     if request.method == "POST":
         r = requests.post(namespace['secretariat'] + 'secretariat' + '/ident', request.form)
-        return render_template('Secretariate_ID_show.html', secretariateid = r.json())
+        return render_template('Secretariate_ID_show.html', secretariateid=r.json())
+
 
 @app.route('/resources/secretariat/add', methods=['POST', 'GET'])
 @admin_permission.require(http_exception=403)
 def render_secretariate_add_form():
-    return render_template('Secretariate_Add_form.html')
-
-@app.route('/resources/secretariat/add/post', methods=['POST'])
-@admin_permission.require(http_exception=403)
-def add_secretariat():
+    if request.method == 'GET':
+        return render_template('Secretariate_Add_form.html')
     if request.method == "POST":
         r = requests.post(namespace['secretariat'] +  'secretariat' + '/add', request.form)
         return render_template('Secretariate_Add_show.html', secretariate_added=r.json())
 
+
 @app.route('/resources/secretariat/delete/ident', methods=['POST', 'GET'])
 @admin_permission.require(http_exception=403)
 def render_secretariate_remove_form():
-    return render_template('Secretariate_Remove_form.html')
-
-
-@app.route('/resources/secretariat/delete/ident/post', methods=['POST'])
-@admin_permission.require(http_exception=403)
-def remove_secretariat():
+    if request.method == 'GET':
+        return render_template('Secretariate_Remove_form.html')
     if request.method == "POST":
         r = requests.post(namespace['secretariat'] + 'secretariat' + '/delete/ident', request.form)
-        return render_template('Secretariates_Remove_showleft.html', secretariate_added = r.json())
+        return render_template('Secretariates_Remove_showleft.html', secretariate_added=r.json())
 
 @app.route('/resources/secretariat/edit', methods=['POST', 'GET'])
 @admin_permission.require(http_exception=403)
 def render_secretariate_edit_form():
-    return render_template('Secretariate_Edit_form.html')
-
-@app.route('/resources/secretariat/edit/post', methods=['POST'])
-@admin_permission.require(http_exception=403)
-def edit_secretariat():
-    if request.method == "POST":
+    if request.method == 'GET':
+        return render_template('Secretariate_Edit_form.html')
+    elif request.method == 'POST':
         requests.post(namespace['secretariat'] + 'secretariat' + '/edit', request.form)
         return render_template('SecretariatsTemplate.html')
 
