@@ -29,9 +29,9 @@ except FileNotFoundError:
 @app.route('/secretariat/ident', methods=['POST'])
 def get_office():
 
-    requests.post(namespace['logs'], json={'request': '/secretariat/' + request.form['ident'],
-                                           'user': request.host,
-                                           'timestamp': datetime.now()})
+    # requests.post(namespace['logs'], json={'request': '/secretariat/' + request.form['ident'],
+    #                                        'user': request.host,
+    #                                        'timestamp': datetime.now()})
     if len(offices) == 0:
         return " There are no Office infrmation yet"
     if request.method == "POST":
@@ -43,9 +43,9 @@ def get_office():
 @app.route('/secretariat/edit', methods=['POST'])
 def edit_office():
 
-    requests.post(namespace['logs'], json={'request': '/secretariat/edit' + request.form['ident'],
-                                           'user': request.host,
-                                           'timestamp': datetime.now()})
+    # requests.post(namespace['logs'], json={'request': '/secretariat/edit' + request.form['ident'],
+    #                                        'user': request.host,
+    #                                        'timestamp': datetime.now()})
 
     if len(offices) == 0 :
         return " There are no Office infrmation yet"

@@ -38,9 +38,9 @@ def get_weekly_meal():
     global weekly_meal
     aux = {}
 
-    requests.post(namespace['logs'], json={'request': '/canteen',
-                                           'user': request.host,
-                                           'timestamp': datetime.now()})
+    # requests.post(namespace['logs'], json={'request': '/canteen',
+    #                                        'user': request.host,
+    #                                        'timestamp': datetime.now()})
 
     if date.today().strftime("%d/%m/%Y")[0:1] == '0':
         date_today = date.today().strftime("%d/%m/%Y")[1:]

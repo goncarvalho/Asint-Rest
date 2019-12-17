@@ -251,41 +251,59 @@ def get_space_api_day(ident, day):
     data = r.json()
     return render_template("RoomsTemplate.html", rooms_events = data, days_of_week = [day])
 
+#SECRETARIATE
 
 @app.route('/resources/secretariat/')
 def render_secretariates():
     return render_template('SecretariatsTemplate.html')
 
+@app.route('/resources/secretariat/ident', methods=['POST'])
+def render_secretariate_id_form():
+    return render_template('Secretariate_ID_form.html')
 
-@app.route('/resources/secretariat/add', methods=['POST'])
+
+@app.route('/resources/secretariat/ident/post', methods=['POST'])
+def show_secretariat():
+    if request.method == "POST":
+        r = requests.post(namespace['secretariat'] + 'secretariat' + '/ident', request.form)
+        return render_template('Secretariate_ID_show.html', secretariateid = r.json())
+
+@app.route('/resources/secretariat/add', methods=['POST', 'GET'])
+@admin_permission.require(http_exception=403)
+def render_secretariate_add_form():
+    return render_template('Secretariate_Add_form.html')
+
+@app.route('/resources/secretariat/add/post', methods=['POST'])
 @admin_permission.require(http_exception=403)
 def add_secretariat():
     if request.method == "POST":
         r = requests.post(namespace['secretariat'] +  'secretariat' + '/add', request.form)
-        return render_template('AddSecretariateResponse.html', secretariate_added=r.json())
+        return render_template('Secretariate_Add_show.html', secretariate_added=r.json())
+
+@app.route('/resources/secretariat/delete/ident', methods=['POST', 'GET'])
+@admin_permission.require(http_exception=403)
+def render_secretariate_remove_form():
+    return render_template('Secretariate_Remove_form.html')
 
 
-@app.route('/resources/secretariat/ident', methods=['POST'])
-def show_secretariat():
-    if request.method == "POST":
-        r = requests.post(namespace['secretariat'] + 'secretariat' + '/ident', request.form)
-        return render_template('ShowSecretariate_id.html', secretariateid = r.json())
-
-
-@app.route('/resources/secretariat/delete/ident', methods=['POST'])
+@app.route('/resources/secretariat/delete/ident/post', methods=['POST'])
 @admin_permission.require(http_exception=403)
 def remove_secretariat():
     if request.method == "POST":
         r = requests.post(namespace['secretariat'] + 'secretariat' + '/delete/ident', request.form)
-        return render_template('ShowSecretariatesAfterRemove.html', secretariate_added = r.json())
+        return render_template('Secretariates_Remove_showleft.html', secretariate_added = r.json())
 
+@app.route('/resources/secretariat/edit', methods=['POST', 'GET'])
+@admin_permission.require(http_exception=403)
+def render_secretariate_edit_form():
+    return render_template('Secretariate_Edit_form.html')
 
-@app.route('/resources/secretariat/edit', methods=['POST'])
+@app.route('/resources/secretariat/edit/post', methods=['POST'])
 @admin_permission.require(http_exception=403)
 def edit_secretariat():
     if request.method == "POST":
-        r = requests.post(namespace['secretariat'] + 'secretariat' + '/edit', request.form)
-        return render_template('AddSecretariateResponse.html', secretariate_added=r.json())
+        requests.post(namespace['secretariat'] + 'secretariat' + '/edit', request.form)
+        return render_template('SecretariatsTemplate.html')
 
 
 @app.route('/resources/canteen/', methods=['GET'])
@@ -317,6 +335,19 @@ def on_identity_loaded(sender, identity):
 
     except:
         "No user"
+
+# MOBILE APP
+
+@app.route('/mobileapp')
+@guest_permission.require(http_exception=403)
+@fenix_permission.require(http_exception=403)
+def render_mobile_options():
+    return render_template('Mobile_APP.html')
+
+@app.route('/mobileapp/qrcode')
+@fenix_permission.require(http_exception=403)
+def QR_code():
+    return render_template('qr_read.html')
 
 
 def list_days_of_week():
