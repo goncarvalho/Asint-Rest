@@ -235,12 +235,12 @@ def validate_secret():
         else:
             return jsonify("No user!")
     else:
-        #return render_template('PostSecret.html')
-        return Response('''
-        <form action="" method="post">
-            <p><input type=text name=secret>
-        </form>
-        ''')
+        return render_template('PostSecret.html')
+        #return Response('''
+        #<form action="" method="post">
+        #    <p><input type=text name=secret>
+        #</form>
+        #''')
 
 
 @app.route('/scanQR', methods=['GET'])
