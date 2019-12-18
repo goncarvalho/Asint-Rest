@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, abort
 import pickle
 from datetime import datetime
 import requests
@@ -29,30 +29,33 @@ except FileNotFoundError:
 @app.route('/secretariat/ident', methods=['POST'])
 def get_office():
 
-    # requests.post(namespace['logs'], json={'request': '/secretariat/' + request.form['ident'],
-    #                                        'user': request.host,
-    #                                        'timestamp': datetime.now()})
+    requests.post(namespace['logs'], json={'request': '/secretariat/',
+                                           'user': request.host,
+                                           'timestamp': datetime.now().isoformat()})
     if len(offices) == 0:
         return " There are no Office infrmation yet"
     if request.method == "POST":
-        ident = request.form['ident']
-    return jsonify(offices[ident].__dict__)
+        if request.form['ident'] in offices:
+            ident = request.form['ident']
+            return jsonify(offices[ident].__dict__)
+        else:
+            return abort(404)
 
 
 @app.route('/secretariat/edit/', methods=['POST'])
 @app.route('/secretariat/edit', methods=['POST'])
 def edit_office():
 
-    # requests.post(namespace['logs'], json={'request': '/secretariat/edit' + request.form['ident'],
-    #                                        'user': request.host,
-    #                                        'timestamp': datetime.now()})
+    requests.post(namespace['logs'], json={'request': '/secretariat/edit',
+                                           'user': request.host,
+                                           'timestamp': datetime.now().isoformat()})
 
     if len(offices) == 0 :
         return " There are no Office infrmation yet"
     if request.method == "POST":
         ident = request.form['ident']
     for key in request.form :
-        if len(request.form[key]) != 0 :
+        if len(request.form[key]) != 0:
             offices[ident].__dict__[key] = request.form[key]
     with open('secretariates.pkl', 'wb') as f:
         pickle.dump((id_secretariat, offices), f)
@@ -63,9 +66,9 @@ def edit_office():
 @app.route('/secretariat/delete/ident', methods=['POST'])
 def delete_office():
 
-    requests.post(namespace['logs'], json={'request': '/secretariat/delete' + request.form['ident'],
+    requests.post(namespace['logs'], json={'request': '/secretariat/delete',
                                            'user': request.host,
-                                           'timestamp': datetime.now()})
+                                           'timestamp': datetime.now().isoformat()})
     list_secretariates = []
     if len(offices) == 0:
         return " There are no Offices to remove"
@@ -87,9 +90,9 @@ def delete_office():
 @app.route('/secretariat/add/', methods=['POST'])
 def add_office():
 
-    requests.post(namespace['logs'], json={'request': '/secretariat/add' + request.form['ident'],
+    requests.post(namespace['logs'], json={'request': '/secretariat/add',
                                            'user': request.host,
-                                           'timestamp': datetime.now()})
+                                           'timestamp': datetime.now().isoformat()})
     global id_secretariat
     if request.method == "POST":
         name = request.form['name']

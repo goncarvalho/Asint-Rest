@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 try:
     with open('logs.pkl', 'rb') as f:
-        (id_secretariat, offices) = pickle.load(f)
+        logs = pickle.load(f)
     f.close()
 except FileNotFoundError:
     logs = []

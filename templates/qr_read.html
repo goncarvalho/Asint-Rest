@@ -4,7 +4,6 @@
       <meta charset="UTF-8">
       <title>Instascan</title>
       <script type="text/javascript" src="{{url_for('static', filename='instascan.min.js') }}"></script>
-      <script type="text/javascript" src="{{url_for('static', filename='json-to-table.js') }}"></script>
   </head>
   <body>
   <h1>QR Code </h1>
@@ -12,7 +11,7 @@
 
   <h1>Result</h1>
 
-  <p id="demo"></p>
+  <pre id="demo"></pre>
 
     <script>
         let scanner = new Instascan.Scanner(
@@ -24,7 +23,7 @@
            xmlhttp = new XMLHttpRequest();
            xmlhttp.onreadystatechange = function() {
                if (this.readyState == 4 && this.status == 200) {
-                   document.getElementById("demo").innerHTML = ConvertJsonToTable(JSON.parse(this.responseText));
+                   document.getElementById("demo").innerHTML = JSON.stringify(JSON.parse(this.responseText), null, 2);
                }
            };
            xmlhttp.open("GET", content.replace("/resources/", "/"), true);

@@ -17,7 +17,7 @@ def get_space_day(ident, date):
 
     requests.post(namespace['logs'], json={'request': '/spaces/' + ident + '/' + date,
                                            'user': request.host,
-                                           'timestamp': datetime.now()})
+                                           'timestamp': datetime.now().isoformat()})
 
     response = get_spaces(ident, date)
     return response
@@ -31,7 +31,7 @@ def get_spaces(ident, day=None):
 
     requests.post(namespace['logs'], json={'request': '/spaces/' + ident,
                                            'user': request.host,
-                                           'timestamp': datetime.now()})
+                                           'timestamp': datetime.now().isoformat()})
 
     if day is not None:
         if str(ident) in ids.keys():
@@ -70,7 +70,7 @@ def save_into_database(room_info, ident):
             while floor.json()['parentSpace']['type'] != 'BUILDING':
                 floor = requests.get(url_spaces + '/' + str(floor.json()['parentSpace']['id']))
             rooms_by_id[str(ident)] = ({'building': floor.json()['parentSpace']['name'],
-                                     'campus': floor.json()['parentSpace']['topLevelSpace']['name']})
+                                        'campus': floor.json()['parentSpace']['topLevelSpace']['name']})
 
             rooms_by_id[str(ident)].update({'events': {}})
         for item in room_info['events']:

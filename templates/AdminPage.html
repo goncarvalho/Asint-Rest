@@ -35,13 +35,8 @@
 <body>
 
 <div class="MicroServersButtons" id="MicroServersButtons">
-    <button onclick="ShowRoomButtons()">Room Information</button>
-    <button onclick="ShowCanteenButtons()">Canteen Information</button>
-    <button onclick="ShowSecretariat()">Secretariates Infomation</button>
-    <button onclick="parent.location='http://127.0.0.1:5000/scanQR'">QR Scan</button>
-    <button onclick="parent.location='http://127.0.0.1:5000/secret'">Get Secret</button>
-    <button onclick="parent.location='http://127.0.0.1:5000/validate'">Validate Secret</button>
-    <button onclick="parent.location='http://127.0.0.1:5000/logAdmin'">Administration Page</button>
+    <button onclick="parent.location='http://127.0.0.1:5000/resources/secretariat/'">Secretariats Information</button>
+    {# show logs here <button onclick="parent.location='http://127.0.0.1:5000/resources/secretariat/'">Logs</button>#}
 </div>
 
 
@@ -78,7 +73,7 @@
 </div>
 
 
-{# Related to Canteen buttons and actions#}
+{#Realted to Canteen buttons and actions#}
 
 <div class="form" id="CanteenScheduleByDay" style="display:none">
             <h1> Canteen Information</h1>
@@ -86,17 +81,6 @@
                 Canteen Day:<input type="text" id="daymeal" placeholder="dd/mm/yyyy"  name="daymeal">
                 <input type="button" value="Canteen day" onClick="parent.location='http://127.0.0.1:5000/resources/canteen/'+ document.getElementById('daymeal').value ">
             </form>
-</div>
-
-{# Related to Secretariats#}
-
-<div id="SecretariatInformation" style="display:none">
-    <div class="form" id="Secretariat">
-    <h1> Secretariat information</h1>
-    <form>
-        <input type="button" value="room ID" onClick="parent.location='http://127.0.0.1:5000/resources/secretariat/ident'">
-    </form>
-    </div>
 </div>
 
 
@@ -111,12 +95,8 @@ function ShowRoomButtons() {
     document.getElementById('InitialSpacesButtons').style.display = "block"
     document.getElementById('MicroServersButtons').style.display = "none"
     document.getElementById('MainPageButton').style.display = "block"
-}
 
-function ShowSecretariat() {
-    document.getElementById('SecretariatInformation').style.display = "block"
-    document.getElementById('MicroServersButtons').style.display = "none"
-    document.getElementById('MainPageButton').style.display = "block"
+
 }
 
 function ShowCanteenButtons() {

@@ -22,6 +22,13 @@ class User:
         self.secret = secret
 
 
+class Secret:
+    def __init__(self, ident, secret):
+        self.id = ident
+        self.secret = secret
+        self.users_used = []
+
+
 # Namespace database
 try:
     with open('namespace.pkl', 'rb') as f:
@@ -61,7 +68,7 @@ admin_permission = Permission(RoleNeed('administrator'))
 fenix_permission = Permission(RoleNeed('fenix'))
 guest_permission = Permission(RoleNeed('guest'))
 
-secrets = ExpiringDict(max_len=100, max_age_seconds=10)
+secrets = ExpiringDict(max_len=100, max_age_seconds=15)
 secret_len = 4
 days_of_week = []
 
@@ -79,13 +86,13 @@ def api(path):
             r = requests.get(namespace[micro_services[0]] + path)
             requests.post(namespace['logs'], json={'request': namespace[micro_services[0]] + path,
                                                    'user': session['identity.id'],
-                                                   'timestamp': datetime.now()})
+                                                   'timestamp': datetime.now().isoformat()})
             return jsonify(r.json())
         else:
             r = requests.post((namespace[micro_services[0]] + path), request.form)
             requests.post(namespace['logs'], json={'request': namespace[micro_services[0]] + path,
                                                    'user': session['identity.id'],
-                                                   'timestamp': datetime.now()})
+                                                   'timestamp': datetime.now().isoformat()})
             return jsonify(r.json())
     else:
         return render_template('NoInfoMeal_404.html', title='404'), 404
@@ -98,6 +105,12 @@ def api(path):
 @guest_permission.require(http_exception=403)
 def main_page():
     return render_template('MainPage.html')
+
+
+@app.route('/admin')
+@guest_permission.require(http_exception=401)
+def adm_page():
+    return render_template('AdminPage.html')
 
 # Login page
 @app.route('/login', methods=['POST', 'GET'])
@@ -113,19 +126,23 @@ def login():
         elif username == 'fenix':
             redirect_page = fenixLoginpage % (client_id, redirect_fenix_uri)
             return redirect(redirect_page)
-
-        else:
-            try:
-                password = request.form['password']
-                if users[username].password == password:
-                    identity_changed.send(app, identity=Identity(username))
-
-            except:
-                pass
-            return redirect(session['redirected_from'])
-
     else:
         return render_template('Login.html')
+
+# Login page
+@app.route('/logAdmin', methods=['POST', 'GET'])
+def login_adm():
+    if request.method == 'POST':
+        username = request.form['username']
+        try:
+            password = request.form['password']
+            if users[username].password == password:
+                identity_changed.send(app, identity=Identity(username))
+        except:
+            pass
+        return redirect(url_for('adm_page'))
+    else:
+        return render_template('LoginAdmin.html')
 
 # Logout
 @app.route("/logout")
@@ -168,21 +185,13 @@ def fenix_authentication():
         return abort(403)
 
 
-@app.errorhandler(403)
-def page_not_found(e):
-    try:
-        logout()
-    finally:
-        session['redirected_from'] = request.url
-        return redirect(url_for('login'))
+@app.route('/secret', methods=['GET'])
+@fenix_permission.require(http_exception=403)
+def show_secret():
+    return render_template('getsecret.html')
 
 
-@app.errorhandler(404)
-def not_found(error):
-    return render_template('NoInfoMeal_404.html', title='404'), 404
-
-
-@app.route('/app/getsecret', methods=['GET'])
+@app.route('/getsecret', methods=['GET'])
 @fenix_permission.require(http_exception=403)
 def get_secret():
 
@@ -190,27 +199,34 @@ def get_secret():
     if users[session['identity.id']].secret is None:
         secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(secret_len))
         users[session['identity.id']].secret = secret
-        secrets[secret] = session['identity.id']
+        secrets[secret] = Secret(session['identity.id'], secret)
     elif users[session['identity.id']].secret in secrets:
         secret = users[session['identity.id']].secret
     else:
         secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(secret_len))
         users[session['identity.id']].secret = secret
-        secrets[secret] = session['identity.id']
+        secrets[secret] = Secret(session['identity.id'], secret)
 
-    return render_template('getsecret.html', data=secret)
+    return jsonify(secrets.get(secret).__dict__)
 
 
 @fenix_permission.require(http_exception=403)
 @app.route('/validate', methods=['GET', 'POST'])
 def validate_secret():
-
     if request.method == 'POST':
         secret = request.form['secret']
 
         if secret in secrets:
-            user = secrets.get(secret)
-            params = {'access_token': users[user].token}
+            data = secrets.get(secret)
+            # add this user to the pool of users that have used this secret
+            params = {'access_token': users[session['identity.id']].token}
+            resp = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params=params)
+            if resp.status_code == 200:
+                r_info = resp.json()
+                secrets[secret].users_used.append(r_info)
+
+            # show the user corresponding to this secret
+            params = {'access_token': users[data.id].token}
             resp = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params=params)
             if resp.status_code == 200:
                 r_info = resp.json()
@@ -225,7 +241,6 @@ def validate_secret():
             <p><input type=text name=secret>
         </form>
         ''')
-
 
 
 @app.route('/scanQR', methods=['GET'])
@@ -257,26 +272,30 @@ def get_space_api(ident):
 def get_space_api_day(ident, day):
     r = requests.get(namespace['spaces'] + 'spaces' + '/' + str(ident) + '/' + day)
     data = r.json()
-    return render_template("RoomsTemplate.html", rooms_events = data, days_of_week = [day])
+    return render_template("RoomsTemplate.html", rooms_events=data, days_of_week=[day])
 
-#SECRETARIATE
+
+# SECRETARIAT
 
 @app.route('/resources/secretariat/')
-def render_secretariates():
+def render_secretariats():
     return render_template('SecretariatsTemplate.html')
 
+
 @app.route('/resources/secretariat/ident', methods=['POST', 'GET'])
-def render_secretariate_id_form():
+def render_secretariat_id_form():
     if request.method == 'GET':
         return render_template('Secretariate_ID_form.html')
     if request.method == "POST":
         r = requests.post(namespace['secretariat'] + 'secretariat' + '/ident', request.form)
+        if r.status_code == 404:
+            return abort(404)
         return render_template('Secretariate_ID_show.html', secretariateid=r.json())
 
 
 @app.route('/resources/secretariat/add', methods=['POST', 'GET'])
-@admin_permission.require(http_exception=403)
-def render_secretariate_add_form():
+@admin_permission.require(http_exception=401)
+def render_secretariat_add_form():
     if request.method == 'GET':
         return render_template('Secretariate_Add_form.html')
     if request.method == "POST":
@@ -285,17 +304,18 @@ def render_secretariate_add_form():
 
 
 @app.route('/resources/secretariat/delete/ident', methods=['POST', 'GET'])
-@admin_permission.require(http_exception=403)
-def render_secretariate_remove_form():
+@admin_permission.require(http_exception=401)
+def render_secretariat_remove_form():
     if request.method == 'GET':
         return render_template('Secretariate_Remove_form.html')
     if request.method == "POST":
         r = requests.post(namespace['secretariat'] + 'secretariat' + '/delete/ident', request.form)
         return render_template('Secretariates_Remove_showleft.html', secretariate_added=r.json())
 
+
 @app.route('/resources/secretariat/edit', methods=['POST', 'GET'])
-@admin_permission.require(http_exception=403)
-def render_secretariate_edit_form():
+@admin_permission.require(http_exception=401)
+def render_secretariat_edit_form():
     if request.method == 'GET':
         return render_template('Secretariate_Edit_form.html')
     elif request.method == 'POST':
@@ -333,18 +353,28 @@ def on_identity_loaded(sender, identity):
     except:
         "No user"
 
-# MOBILE APP
 
-@app.route('/mobileapp')
-@guest_permission.require(http_exception=403)
-@fenix_permission.require(http_exception=403)
-def render_mobile_options():
-    return render_template('Mobile_APP.html')
+@app.errorhandler(401)
+def unauthorized(e):
+    try:
+        logout()
+    finally:
+        session['redirected_from'] = request.url
+        return redirect(url_for('login_adm'))
 
-@app.route('/mobileapp/qrcode')
-@fenix_permission.require(http_exception=403)
-def QR_code():
-    return render_template('qr_read.html')
+
+@app.errorhandler(403)
+def forbidden(e):
+    try:
+        logout()
+    finally:
+        session['redirected_from'] = request.url
+        return redirect(url_for('login'))
+
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('NoInfoMeal_404.html', title='404'), 404
 
 
 def list_days_of_week():
