@@ -7,7 +7,7 @@ import requests
 url_canteen = str('https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen')
 url_canteen_day = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen?day="
 
-namespace = {'logs': 'http://127.0.0.1:5004/addlog'}
+namespace = {'logs': 'http://127.0.0.1:5004/'}
 
 def list_days_of_week():
     global days_of_week
@@ -31,16 +31,16 @@ list_days_of_week()
 
 app = Flask(__name__)
 
-
+@app.before_request
+def before_request():
+    requests.post(namespace['logs'] + 'addlog', json={'request': request.url,
+                                                      'user': request.host,
+                                                      'timestamp': datetime.now().isoformat()})
 @app.route('/canteen/', methods=['GET'])
 @app.route('/canteen', methods=['GET'])
 def get_weekly_meal():
     global weekly_meal
     aux = {}
-
-    requests.post(namespace['logs'], json={'request': '/canteen',
-                                           'user': request.host,
-                                           'timestamp': datetime.now().isoformat()})
 
     if date.today().strftime("%d/%m/%Y")[0:1] == '0':
         date_today = date.today().strftime("%d/%m/%Y")[1:]
@@ -74,10 +74,6 @@ def get_weekly_meal():
 def check_meal(day):
     global weekly_meal
     aux = {}
-
-    requests.post(namespace['logs'], json={'request': '/canteen/' + day,
-                                           'user': request.host,
-                                           'timestamp': datetime.now().isoformat()})
 
     if day[0:1] == '0':
         day = day[1:]

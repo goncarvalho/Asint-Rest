@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ementa</title>
+    <title>Rooms</title>
     <style>
         body{
             background: #ffffff; text-decoration: none;
@@ -10,23 +10,28 @@
     </style>
 </head>
 <body>
-<h1>Weekly Menu </h1>
+<h1>Weekly schedule Room </h1>
 
 
 {% for day in days_of_week %}
     <p>{{ day }}</p>
-        {% for i in rooms_events['events'][day] %}
-            <p>{{ i['type'] }}</p>
-            <ul>
-                {% if i['type'] == 'LESSON' %}
-                    <p>  {{ i['course']['name'] }}</p>
-                {% endif %}
-                {% if i['type'] == 'GENERIC'%}
-                    <p>{{i['title']}}</p>
-                {% endif %}
-                <p>{{ 'Time: ' + i['start'] + '-' + i['end'] }}</p>
-            </ul>
-        {% endfor %}
+        {% if day in rooms_events['events']%}
+            {% for i in rooms_events['events'][day] %}
+                <p>{{ i['type'] }}</p>
+                <ul>
+                    {% if i['type'] == 'LESSON' %}
+                        <p>  {{ i['course']['name'] }}</p>
+                    {% endif %}
+                    {% if i['type'] == 'TEST' %}
+                        <p>  {{ i['courses'][0]['name'] }}</p>
+                    {% endif %}
+                    {% if i['type'] == 'GENERIC'%}
+                        <p>{{i['title']}}</p>
+                    {% endif %}
+                    <p>{{ 'Time: ' + i['start'] + '-' + i['end'] }}</p>
+                </ul>
+            {% endfor %}
+        {% endif %}
 {% endfor %}
 
 

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logs</title>
+</head>
+<body>
+<h1>Logs</h1>
+    {% for i in range(data|length)%}
+        <p>{{'Accessed in ' + '['+ data[i]['timestamp'] +']' + ' - ' + data[i]['request'] + ' requested by ' + data[i]['user']}}</p>
+    {% endfor %}
+</body>
+</html>

@@ -14,7 +14,7 @@ class Office:
 
 app = Flask(__name__)
 
-namespace = {'logs': 'http://127.0.0.1:5004/addlog'}
+namespace = {'logs': 'http://127.0.0.1:5004/'}
 
 try:
     with open('secretariates.pkl', 'rb') as f:
@@ -24,14 +24,15 @@ except FileNotFoundError:
     offices = {}
     id_secretariat = 0
 
-
+@app.before_request
+def before_request():
+    requests.post(namespace['logs'] + 'addlog', json={'request': request.url,
+                                                      'user': request.host,
+                                                      'timestamp': datetime.now().isoformat()})
 @app.route('/secretariat/ident/', methods=['POST'])
 @app.route('/secretariat/ident', methods=['POST'])
 def get_office():
 
-    requests.post(namespace['logs'], json={'request': '/secretariat/',
-                                           'user': request.host,
-                                           'timestamp': datetime.now().isoformat()})
     if len(offices) == 0:
         return " There are no Office infrmation yet"
     if request.method == "POST":
@@ -45,10 +46,6 @@ def get_office():
 @app.route('/secretariat/edit/', methods=['POST'])
 @app.route('/secretariat/edit', methods=['POST'])
 def edit_office():
-
-    requests.post(namespace['logs'], json={'request': '/secretariat/edit',
-                                           'user': request.host,
-                                           'timestamp': datetime.now().isoformat()})
 
     if len(offices) == 0 :
         return " There are no Office infrmation yet"
@@ -66,9 +63,6 @@ def edit_office():
 @app.route('/secretariat/delete/ident', methods=['POST'])
 def delete_office():
 
-    requests.post(namespace['logs'], json={'request': '/secretariat/delete',
-                                           'user': request.host,
-                                           'timestamp': datetime.now().isoformat()})
     list_secretariates = []
     if len(offices) == 0:
         return " There are no Offices to remove"
@@ -90,9 +84,6 @@ def delete_office():
 @app.route('/secretariat/add/', methods=['POST'])
 def add_office():
 
-    requests.post(namespace['logs'], json={'request': '/secretariat/add',
-                                           'user': request.host,
-                                           'timestamp': datetime.now().isoformat()})
     global id_secretariat
     if request.method == "POST":
         name = request.form['name']

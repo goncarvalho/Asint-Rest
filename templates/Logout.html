@@ -2,10 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Page</title>
+    <title>Logout Successfull</title>
     <style>
         h1 { color: #111; font-family: 'Helvetica Neue', sans-serif; font-size: 15px; font-weight: bold; letter-spacing: -1px; line-height: 1; text-align: center; }
-        input[type=text] { border: 2px solid red; border-radius: 4px; text-align: center;}
+        div.MainPageButton {display: block;text-align: center; margin-bottom:5px}
+        form {
+            display: inline-block;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left;
+            margin-bottom:5px
+        }
         input[type=button], button {
             border: none;
             padding: 8px 15px 8px 15px;
@@ -19,23 +26,12 @@
             -moz-border-radius: 3px;
             margin-bottom:5px
         }
-
-        div.Buttons{display: block;text-align: center; margin-bottom:5px}
-
-
     </style>
 </head>
-
 <body>
-
-<div class="Buttons" id="Secretariat">
-    <button onclick="parent.location='http://127.0.0.1:5000/admin/secretariat/'">Secretariats Information</button>
-    <button onclick="parent.location='http://127.0.0.1:5000/admin/logs/'">List Logs</button>
-    <button onclick="parent.location='http://127.0.0.1:5000/admin/addmicroservice/'">Add Microservice</button>
-    <button onclick="parent.location='http://127.0.0.1:5000/logout'">Logout</button>
+<h1>Logout Successful</h1>
+<div class="MainPageButton" id="MainPageButton" style="display:block" >
+    <input type="button" value="MainPage" onClick="parent.location='/'">
 </div>
-
-
 </body>
 </html>
-

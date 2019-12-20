@@ -41,7 +41,12 @@
     <button onclick="parent.location='http://127.0.0.1:5000/scanQR'">QR Scan</button>
     <button onclick="parent.location='http://127.0.0.1:5000/secret'">Get Secret</button>
     <button onclick="parent.location='http://127.0.0.1:5000/validate'">Validate Secret</button>
-    <button onclick="parent.location='http://127.0.0.1:5000/logAdmin'">Administration Page</button>
+    <button onclick="parent.location='http://127.0.0.1:5000/admin'">Administration Page</button>
+    {% if identity is none %}
+
+    {% elif identity[0:3] == 'ist' or identity == 'administrador' %}
+        <button onclick="parent.location='http://127.0.0.1:5000/logout'">Logout</button>
+    {% endif %}
 </div>
 
 

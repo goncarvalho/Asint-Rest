@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Microservice</title>
+</head>
+<body>
+<h1>Add new microserver</h1>
+<form action="" method="post" onsubmit="return validation()">
+    <p>Header Microservice<input type=text name=header id="header"></p>
+    <p>Endpoint Microservice<input type=text name=endpoint id = 'endpoint'></p>
+    <p><input type=submit value=Create>
+</form>
+<script>
+    function validation(){
+        var header = document.getElementById("header").value;
+        var endpoint = document.getElementById("endpoint").value;
+        if( header ==='' || endpoint ===''){
+            alert("Please fill all the fields...!!!!!!");
+            return false;
+        }else{
+            return true;
+        }
+    }
+</script>
+</body>
+</html>

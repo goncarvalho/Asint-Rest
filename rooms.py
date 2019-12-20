@@ -9,15 +9,17 @@ app = Flask(__name__)
 rooms_by_id = {}
 ids = {}
 
-namespace = {'logs': 'http://127.0.0.1:5004/addlog'}
+namespace = {'logs': 'http://127.0.0.1:5004/'}
+
+@app.before_request
+def before_request():
+    requests.post(namespace['logs'] + 'addlog', json={'request': request.url,
+                                                      'user': request.host,
+                                                      'timestamp': datetime.now().isoformat()})
 
 
 @app.route('/spaces/<ident>/<path:date>', methods=['GET'])
 def get_space_day(ident, date):
-
-    requests.post(namespace['logs'], json={'request': '/spaces/' + ident + '/' + date,
-                                           'user': request.host,
-                                           'timestamp': datetime.now().isoformat()})
 
     response = get_spaces(ident, date)
     return response
@@ -28,10 +30,6 @@ def get_space_day(ident, date):
 @app.route('/spaces/<ident>', methods=['GET'])
 def get_spaces(ident, day=None):
     global ids
-
-    requests.post(namespace['logs'], json={'request': '/spaces/' + ident,
-                                           'user': request.host,
-                                           'timestamp': datetime.now().isoformat()})
 
     if day is not None:
         if str(ident) in ids.keys():
