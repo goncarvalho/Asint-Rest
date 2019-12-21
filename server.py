@@ -37,8 +37,7 @@ try:
 except FileNotFoundError:
     namespace = {'logs': 'http://127.0.0.1:5004/', 'spaces': 'http://127.0.0.1:5002/',
                  'canteen': 'http://127.0.0.1:5001/',
-                 'secretariat': 'http://127.0.0.1:5003/', 'server': 'http://127.0.0.1:5000/',
-                 'parking': 'https://fenix.tecnico.ulisboa.pt/api/fenix/v1/parking'}
+                 'secretariat': 'http://127.0.0.1:5003/', 'server': 'http://127.0.0.1:5000/'}
 
 # User database
 try:
@@ -75,6 +74,7 @@ days_of_week = []
 
 """API"""
 
+
 @app.before_request
 def before_request():
     try:
@@ -88,6 +88,8 @@ def before_request():
                                                               'timestamp': datetime.now().isoformat()})
     except:
         pass
+
+
 @app.route('/<path:path>/', methods=['POST', 'GET'])
 def api(path):
 
@@ -234,11 +236,6 @@ def validate_secret():
             return jsonify("No user!")
     else:
         return render_template('PostSecret.html')
-        #return Response('''
-        #<form action="" method="post">
-        #    <p><input type=text name=secret>
-        #</form>
-        #''')
 
 
 @app.route('/scanQR', methods=['GET'])
@@ -251,7 +248,7 @@ def get_micro_service_info(path):
     micro_services = path.split('/')
     if str(micro_services[0]) in namespace:
         if request.method == 'GET':
-            r = requests.get(namespace[micro_services[0]])
+            r = requests.get(namespace[micro_services[0]] + path)
             data = r.json()
             return json2html.convert(json=data)
     else:
@@ -271,6 +268,7 @@ def get_space_api_day(ident, day):
     data = r.json()
     return render_template("RoomsTemplate.html", rooms_events=data, days_of_week=[day])
 
+
 @app.route('/admin/addmicroservice/', methods=['GET', 'POST'])
 @app.route('/admin/addmicroservice', methods=['GET', 'POST'])
 @admin_permission.require(http_exception=401)
@@ -280,7 +278,10 @@ def add_microservice():
     if request.method == 'POST':
         endpoint = request.form['endpoint']
         header = request.form['header']
-        namespace[header] = endpoint;
+        namespace[header] = endpoint
+        with open('namespace.pkl', 'wb') as fd:
+            pickle.dump(namespace, fd)
+        fd.close()
         return render_template("AdminPage.html")
 
 # SECRETARIAT
@@ -333,14 +334,13 @@ def render_secretariat_edit_form():
 
 #logs
 
+
 @app.route('/admin/logs/', methods=['GET'])
 @admin_permission.require(http_exception=401)
 def render_logs():
     r = requests.get(namespace['logs'] + 'getlog')
     data = r.json()
     return render_template("ShowLogs.html", data=data)
-
-
 
 
 @app.route('/resources/canteen/', methods=['GET'])
