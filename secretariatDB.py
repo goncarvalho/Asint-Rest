@@ -34,7 +34,7 @@ def before_request():
 def get_office():
 
     if len(offices) == 0:
-        return " There are no Office infrmation yet"
+        return abort(404)
     if request.method == "POST":
         if request.form['ident'] in offices:
             ident = request.form['ident']
@@ -54,6 +54,7 @@ def edit_office():
     for key in request.form :
         if len(request.form[key]) != 0:
             offices[ident].__dict__[key] = request.form[key]
+    # dump new info to pickle
     with open('secretariates.pkl', 'wb') as f:
         pickle.dump((id_secretariat, offices), f)
     return jsonify(offices[ident].__dict__)
@@ -72,7 +73,6 @@ def delete_office():
             offices.pop(ident)
             with open('secretariates.pkl', 'wb') as f:
                 pickle.dump((id_secretariat, offices), f)
-
 
         except KeyError:
             return 400

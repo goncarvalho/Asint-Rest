@@ -3,8 +3,7 @@ import pickle
 
 app = Flask(__name__)
 
-# To use just send requests.post('http://127.0.0.1:5004/addlogs', json=data), with data being json
-
+# To use just send requests.post('http://127.0.0.1:5004/addlog', json=data)
 try:
     with open('logs.pkl', 'rb') as f:
         logs = pickle.load(f)

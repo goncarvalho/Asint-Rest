@@ -14,7 +14,6 @@ def list_days_of_week():
     day = date.today().strftime("%d/%m/%Y")
     dt = datetime.strptime(day, '%d/%m/%Y')
     start = dt - timedelta(days=dt.weekday())
-    print(str(start))
     if start.strftime('%d/%m/%Y')[0:1] == '0':
         days_of_week.append(start.strftime('%d/%m/%Y')[1:])
         for i in range(4):
@@ -41,11 +40,12 @@ def before_request():
 def get_weekly_meal():
     global weekly_meal
     aux = {}
-
+    #corrects to single digit day
     if date.today().strftime("%d/%m/%Y")[0:1] == '0':
         date_today = date.today().strftime("%d/%m/%Y")[1:]
     else:
         date_today = date.today().strftime("%d/%m/%Y")
+    # if data is cached
     if date_today in weekly_meal.keys():
         for item in days_of_week:
             try:

@@ -72,9 +72,6 @@ secret_len = 4
 days_of_week = []
 
 
-"""API"""
-
-
 @app.before_request
 def before_request():
     try:
@@ -88,6 +85,9 @@ def before_request():
                                                               'timestamp': datetime.now().isoformat()})
     except:
         pass
+
+
+"""API"""
 
 
 @app.route('/<path:path>/', methods=['POST', 'GET'])
@@ -116,10 +116,12 @@ def main_page():
     except:
         return render_template('MainPage.html', identity = None)
 
+
 @app.route('/admin')
 @admin_permission.require(http_exception=401)
 def adm_page():
     return render_template('AdminPage.html')
+
 
 # Login page
 @app.route('/login', methods=['POST', 'GET'])
@@ -127,7 +129,8 @@ def login():
     redirect_page = fenixLoginpage % (client_id, redirect_fenix_uri)
     return redirect(redirect_page)
 
-# Login page
+
+# Admin Login page
 @app.route('/logAdmin', methods=['POST', 'GET'])
 def login_adm():
     if request.method == 'POST':
@@ -143,7 +146,7 @@ def login_adm():
     else:
         return render_template('LoginAdmin.html')
 
-# Logout
+
 @app.route("/logout")
 def logout():
     for key in ['identity.name', 'identity.auth_type', 'redirected_from']:
@@ -176,6 +179,7 @@ def fenix_authentication():
         login_name = r_info['username']
         user_token = r_token['access_token']
 
+        # enroll user to server
         users[login_name] = User(login_name, None, ['fenix'], token=user_token)
         identity_changed.send(app, identity=Identity(login_name))
 
@@ -209,7 +213,6 @@ def get_secret():
     return jsonify(secrets.get(secret).__dict__)
 
 
-
 @app.route('/validate', methods=['GET', 'POST'])
 @fenix_permission.require(http_exception=403)
 def validate_secret():
@@ -231,7 +234,6 @@ def validate_secret():
             if resp.status_code == 200:
                 r_info = resp.json()
                 return jsonify(r_info)
-
         else:
             return jsonify("No user!")
     else:
@@ -243,6 +245,7 @@ def render_scanqr():
     return render_template('qr_read.html')
 
 
+# generic microservice html
 @app.route('/resources/<path:path>/', methods=['GET'])
 def get_micro_service_info(path):
     micro_services = path.split('/')
@@ -255,6 +258,7 @@ def get_micro_service_info(path):
         return render_template('Error404.html', title='404'), 404
 
 
+# Rooms
 @app.route('/resources/spaces/<path:ident>', methods=['GET'])
 def get_space_api(ident):
     r = requests.get(namespace['spaces'] + 'spaces' + '/' + ident)
@@ -284,8 +288,8 @@ def add_microservice():
         fd.close()
         return render_template("AdminPage.html")
 
-# SECRETARIAT
 
+# Secretariate
 @app.route('/admin/secretariat/')
 @admin_permission.require(http_exception=401)
 def render_secretariats():
@@ -332,9 +336,8 @@ def render_secretariat_edit_form():
         requests.post(namespace['secretariat'] + 'secretariat' + '/edit', request.form)
         return render_template('SecretariatsTemplate.html')
 
-#logs
 
-
+# Logs
 @app.route('/admin/logs/', methods=['GET'])
 @admin_permission.require(http_exception=401)
 def render_logs():
@@ -343,11 +346,16 @@ def render_logs():
     return render_template("ShowLogs.html", data=data)
 
 
+# Canteen
 @app.route('/resources/canteen/', methods=['GET'])
 def get_canteen_():
     r = requests.get(namespace['canteen'] + 'canteen')
     data = r.json()
-    return render_template("CanteenTemplate.html", weekly_menu=data)
+    try:
+        if data['errorCode'] == 404:
+            return not_found(404)
+    except:
+        return render_template("CanteenTemplate.html", weekly_menu=data)
 
 
 @app.route('/resources/canteen/<path:c_date>', methods=['GET'])
@@ -361,6 +369,7 @@ def get_canteen_day(c_date):
         return render_template("CanteenTemplate.html", weekly_menu=data)
 
 
+# User enrollment
 @identity_loaded.connect_via(app)
 def on_identity_loaded(sender, identity):
 
@@ -372,6 +381,7 @@ def on_identity_loaded(sender, identity):
         "No user"
 
 
+# Error handling
 @app.errorhandler(401)
 def unauthorized(e):
     try:
@@ -404,7 +414,6 @@ def list_days_of_week():
     days_of_week.append(start.strftime('%d/%m/%Y'))
     for i in range(4):
         days_of_week.append((start + timedelta(days=i + 1)).strftime('%d/%m/%Y'))
-    # print(days_of_week)
 
 
 if __name__ == '__main__':
