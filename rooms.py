@@ -30,34 +30,35 @@ def get_space_day(ident, date):
 @app.route('/spaces/<ident>', methods=['GET'])
 def get_spaces(ident, day=None):
     global ids
-
-    if day is not None:
-        if str(ident) in ids.keys():
-            if day not in ids[str(ident)]:
-                ids[str(ident)]+list_days_of_week(day)
+    try:
+        if day is not None:
+            if str(ident) in ids.keys():
+                if day not in ids[str(ident)]:
+                    ids[str(ident)]+list_days_of_week(day)
+                    data = requests.get(url_spaces + '/' + str(ident) + '?day=' + day)
+                    room_info = data.json()
+                    save_into_database(room_info, ident)
+            else:
+                ids[str(ident)] = list_days_of_week(day)
                 data = requests.get(url_spaces + '/' + str(ident) + '?day=' + day)
                 room_info = data.json()
                 save_into_database(room_info, ident)
+            return jsonify(rooms_by_id[str(ident)])
         else:
-            ids[str(ident)] = list_days_of_week(day)
-            data = requests.get(url_spaces + '/' + str(ident) + '?day=' + day)
-            room_info = data.json()
-            save_into_database(room_info, ident)
-        return jsonify(rooms_by_id[str(ident)])
-    else:
-        if str(ident) in ids.keys():
-            if date.today().strftime("%d/%m/%Y") not in ids[str(ident)]:
-                ids[str(ident)]+list_days_of_week(date.today().strftime("%d/%m/%Y"))
+            if str(ident) in ids.keys():
+                if date.today().strftime("%d/%m/%Y") not in ids[str(ident)]:
+                    ids[str(ident)]+list_days_of_week(date.today().strftime("%d/%m/%Y"))
+                    data = requests.get(url_spaces + '/' + str(ident))
+                    room_info = data.json()
+                    save_into_database(room_info, ident)
+            else:
+                ids[str(ident)] = list_days_of_week(date.today().strftime("%d/%m/%Y"))
                 data = requests.get(url_spaces + '/' + str(ident))
                 room_info = data.json()
                 save_into_database(room_info, ident)
-        else:
-            ids[str(ident)] = list_days_of_week(date.today().strftime("%d/%m/%Y"))
-            data = requests.get(url_spaces + '/' + str(ident))
-            room_info = data.json()
-            save_into_database(room_info, ident)
-        return jsonify(rooms_by_id[str(ident)])
-
+            return jsonify(rooms_by_id[str(ident)])
+    except:
+        return 404
 
 def save_into_database(room_info, ident):
     global rooms_by_id

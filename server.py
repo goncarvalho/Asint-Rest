@@ -116,7 +116,7 @@ def main_page():
     except:
         return render_template('MainPage.html', identity = None)
 
-
+@app.route('/admin/')
 @app.route('/admin')
 @admin_permission.require(http_exception=401)
 def adm_page():
@@ -187,13 +187,13 @@ def fenix_authentication():
     else:
         return abort(403)
 
-
+@app.route('/secret/', methods=['GET'])
 @app.route('/secret', methods=['GET'])
 @fenix_permission.require(http_exception=403)
 def show_secret():
     return render_template('getsecret.html')
 
-
+@app.route('/getsecret/', methods=['GET'])
 @app.route('/getsecret', methods=['GET'])
 @fenix_permission.require(http_exception=403)
 def get_secret():
@@ -212,7 +212,7 @@ def get_secret():
 
     return jsonify(secrets.get(secret).__dict__)
 
-
+@app.route('/validate/', methods=['GET', 'POST'])
 @app.route('/validate', methods=['GET', 'POST'])
 @fenix_permission.require(http_exception=403)
 def validate_secret():
@@ -239,7 +239,7 @@ def validate_secret():
     else:
         return render_template('PostSecret.html')
 
-
+@app.route('/scanQR/', methods=['GET'])
 @app.route('/scanQR', methods=['GET'])
 def render_scanqr():
     return render_template('qr_read.html')
@@ -247,11 +247,14 @@ def render_scanqr():
 
 # generic microservice html
 @app.route('/resources/<path:path>/', methods=['GET'])
+@app.route('/resources/<path:path>', methods=['GET'])
 def get_micro_service_info(path):
     micro_services = path.split('/')
     if str(micro_services[0]) in namespace:
         if request.method == 'GET':
             r = requests.get(namespace[micro_services[0]] + path)
+            if r.status_code == 404 or r.status_code == 500:
+                return abort(404)
             data = r.json()
             return json2html.convert(json=data)
     else:
@@ -259,16 +262,21 @@ def get_micro_service_info(path):
 
 
 # Rooms
+@app.route('/resources/spaces/<path:ident>/', methods=['GET'])
 @app.route('/resources/spaces/<path:ident>', methods=['GET'])
 def get_space_api(ident):
     r = requests.get(namespace['spaces'] + 'spaces' + '/' + ident)
+    if r.status_code == 404 or r.status_code == 500:
+        return abort(404)
     data = r.json()
     return render_template("RoomsTemplate.html", rooms_events=data, days_of_week=days_of_week)
 
-
+@app.route('/resources/spaces/<ident>/<path:day>/', methods=['GET'])
 @app.route('/resources/spaces/<ident>/<path:day>', methods=['GET'])
 def get_space_api_day(ident, day):
     r = requests.get(namespace['spaces'] + 'spaces' + '/' + str(ident) + '/' + day)
+    if r.status_code == 404 or r.status_code == 500:
+        return abort(404)
     data = r.json()
     return render_template("RoomsTemplate.html", rooms_events=data, days_of_week=[day])
 
@@ -291,22 +299,21 @@ def add_microservice():
 
 # Secretariate
 @app.route('/admin/secretariat/')
+@app.route('/admin/secretariat')
 @admin_permission.require(http_exception=401)
 def render_secretariats():
     return render_template('SecretariatsTemplate.html')
 
-
-@app.route('/resources/secretariat/ident', methods=['POST', 'GET'])
-def render_secretariat_id_form():
+@app.route('/resources/secretariat/ident/<id>/', methods=['GET'])
+@app.route('/resources/secretariat/ident/<id>', methods=['GET'])
+def render_secretariat_id_form(id):
     if request.method == 'GET':
-        return render_template('Secretariate_ID_form.html')
-    if request.method == "POST":
-        r = requests.post(namespace['secretariat'] + 'secretariat' + '/ident', request.form)
-        if r.status_code == 404:
+        r = requests.get(namespace['secretariat'] + 'secretariat' + '/ident/' + str(id))
+        if r.status_code == 404 or r.status_code == 500:
             return abort(404)
         return render_template('Secretariate_ID_show.html', secretariateid=r.json())
 
-
+@app.route('/admin/secretariat/add/', methods=['POST', 'GET'])
 @app.route('/admin/secretariat/add', methods=['POST', 'GET'])
 @admin_permission.require(http_exception=401)
 def render_secretariat_add_form():
@@ -314,9 +321,13 @@ def render_secretariat_add_form():
         return render_template('Secretariate_Add_form.html')
     if request.method == "POST":
         r = requests.post(namespace['secretariat'] +  'secretariat' + '/add', request.form)
+        if r.status_code == 404:
+            return abort(404)
+        if r.status_code == 500:
+            return "Failed to add!"
         return render_template('Secretariate_Add_show.html', secretariate_added=r.json())
 
-
+@app.route('/admin/secretariat/delete/ident/', methods=['POST', 'GET'])
 @app.route('/admin/secretariat/delete/ident', methods=['POST', 'GET'])
 @admin_permission.require(http_exception=401)
 def render_secretariat_remove_form():
@@ -324,8 +335,12 @@ def render_secretariat_remove_form():
         return render_template('Secretariate_Remove_form.html')
     if request.method == "POST":
         r = requests.post(namespace['secretariat'] + 'secretariat' + '/delete/ident', request.form)
-        return render_template('Secretariates_Remove_showleft.html', secretariate_added=r.json())
-
+        if r.status_code == 404 or r.status_code == 500:
+            return abort(404)
+        try:
+            return render_template('Secretariates_Remove_showleft.html', secretariate_added=r.json())
+        except:
+            return "THERE ARE NO SECRETARITES TO REMOVE"
 
 @app.route('/admin/secretariat/edit', methods=['POST', 'GET'])
 @admin_permission.require(http_exception=401)
@@ -333,9 +348,10 @@ def render_secretariat_edit_form():
     if request.method == 'GET':
         return render_template('Secretariate_Edit_form.html')
     elif request.method == 'POST':
-        requests.post(namespace['secretariat'] + 'secretariat' + '/edit', request.form)
+        r = requests.post(namespace['secretariat'] + 'secretariat' + '/edit', request.form)
+        if r.status_code == 404 or r.status_code == 500:
+            return abort(404)
         return render_template('SecretariatsTemplate.html')
-
 
 # Logs
 @app.route('/admin/logs/', methods=['GET'])

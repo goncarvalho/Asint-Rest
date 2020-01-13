@@ -77,6 +77,8 @@ def check_meal(day):
 
     if day[0:1] == '0':
         day = day[1:]
+        if day[2:3] == '0':
+            day = day[0:2]+day[3:]
     if date in weekly_meal.keys():
         aux[day] = weekly_meal[day]
         return jsonify(aux)

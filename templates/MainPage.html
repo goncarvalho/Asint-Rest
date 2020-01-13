@@ -99,7 +99,9 @@
     <div class="form" id="Secretariat">
     <h1> Secretariat information</h1>
     <form>
-        <input type="button" value="room ID" onClick="parent.location='http://127.0.0.1:5000/resources/secretariat/ident'">
+        Secretariate ID:<input type="text" id="ident" placeholder="ID"  name="ident">
+        <input type="button" value="SecretariateID" onClick="parent.location='http://127.0.0.1:5000/resources/secretariat/ident/'+ document.getElementById('ident').value ">
+
     </form>
     </div>
 </div>

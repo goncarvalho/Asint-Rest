@@ -29,15 +29,15 @@ def before_request():
     requests.post(namespace['logs'] + 'addlog', json={'request': request.url,
                                                       'user': request.host,
                                                       'timestamp': datetime.now().isoformat()})
-@app.route('/secretariat/ident/', methods=['POST'])
-@app.route('/secretariat/ident', methods=['POST'])
-def get_office():
+@app.route('/secretariat/ident/<id>/', methods=['GET'])
+@app.route('/secretariat/ident/<id>', methods=['GET'])
+def get_office(id):
 
     if len(offices) == 0:
         return abort(404)
-    if request.method == "POST":
-        if request.form['ident'] in offices:
-            ident = request.form['ident']
+    if request.method == "GET":
+        if str(id) in offices:
+            ident = str(id)
             return jsonify(offices[ident].__dict__)
         else:
             return abort(404)
@@ -48,7 +48,7 @@ def get_office():
 def edit_office():
 
     if len(offices) == 0 :
-        return " There are no Office infrmation yet"
+        return abort(404)
     if request.method == "POST":
         ident = request.form['ident']
     for key in request.form :
@@ -75,13 +75,14 @@ def delete_office():
                 pickle.dump((id_secretariat, offices), f)
 
         except KeyError:
-            return 400
+            return 404
         for i in offices.keys():
             list_secretariates.append(offices[i].__dict__)
     return jsonify(list_secretariates)
 
 
 @app.route('/secretariat/add/', methods=['POST'])
+@app.route('/secretariat/add', methods=['POST'])
 def add_office():
 
     global id_secretariat
